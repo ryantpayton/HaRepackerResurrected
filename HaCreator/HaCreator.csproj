@@ -691,9 +691,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HaRepacker\Harepacker-resurrected.csproj">
+    <ProjectReference Include="..\HaRepacker\HaRepacker.csproj">
       <Project>{0b7155ef-1eb0-4fae-ba56-8064cbaf2bea}</Project>
-      <Name>Harepacker-resurrected</Name>
+      <Name>HaRepacker</Name>
     </ProjectReference>
     <ProjectReference Include="..\MapleLib\MapleLib.csproj">
       <Project>{28AAB36D-942E-4476-A000-0E9DE380F390}</Project>

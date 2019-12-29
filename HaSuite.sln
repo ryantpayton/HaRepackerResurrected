@@ -1,12 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleLib", "MapleLib\MapleLib.csproj", "{28AAB36D-942E-4476-A000-0E9DE380F390}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaCreator", "HaCreator\HaCreator.csproj", "{679DD557-5E1E-447E-B48C-0F082E5FB1F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harepacker-resurrected", "HaRepacker\Harepacker-resurrected.csproj", "{0B7155EF-1EB0-4FAE-BA56-8064CBAF2BEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaRepacker", "HaRepacker\HaRepacker.csproj", "{0B7155EF-1EB0-4FAE-BA56-8064CBAF2BEA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32", "Win32\Win32.csproj", "{638CA88A-8DEE-4AF4-9B43-7ABDFDB074F7}"
 EndProject

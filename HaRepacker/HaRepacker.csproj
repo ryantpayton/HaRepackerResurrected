@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HaRepacker</RootNamespace>
-    <AssemblyName>HaRepackerResurrected</AssemblyName>
+    <AssemblyName>HaRepacker</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -17,7 +17,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <PublishUrl>C:\Users\twili\Desktop\Publish\</PublishUrl>
+    <PublishUrl>C:\Users\Ryan\Desktop\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -362,8 +362,6 @@
     <Compile Include="Configuration\ApplicationSettings.cs" />
     <Compile Include="Configuration\UserSettings.cs" />
     <Compile Include="SharpApng.cs" />
-    <Compile Include="Spine\SpriteBatchItem.cs" />
-    <Compile Include="Spine\VertexPositionColorTexture.cs" />
     <Compile Include="TreeViewMS.cs">
       <SubType>Component</SubType>
     </Compile>
