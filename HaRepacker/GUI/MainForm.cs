@@ -1545,12 +1545,12 @@ namespace HaRepacker.GUI
             //MainPanel.findStrip.Visible = true;
         }
 
-        private static readonly string HelpFile = "Help.htm";
+        private static readonly string HelpFile = "help.html";
         private void viewHelpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string helpPath = Path.Combine(Application.StartupPath, HelpFile);
+            string helpPath = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.FullName, HelpFile);
             if (File.Exists(helpPath))
-                Help.ShowHelp(this, HelpFile);
+                Help.ShowHelp(this, helpPath);
             else
                 Warning.Error(string.Format(HaRepacker.Properties.Resources.MainHelpOpenFail, HelpFile));
         }
