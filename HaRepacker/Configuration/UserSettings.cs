@@ -71,6 +71,6 @@ namespace HaRepacker.Configuration
         public bool EnableCrossHairDebugInformation = true;
 
         [JsonProperty(PropertyName = "ImageZoomLevel")]
-        public double ImageZoomLevel = 3.0f;
+        public double ImageZoomLevel = 1.0f;
     }
 }
