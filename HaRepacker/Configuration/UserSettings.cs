@@ -11,6 +11,12 @@ namespace HaRepacker.Configuration
 {
     public class UserSettings
     {
+        public enum UserSettingsThemeColor
+        {
+            Dark = 0,
+            Light = 1
+        }
+
         [JsonProperty(PropertyName = "Indentation")]
         public int Indentation = 0;
 
@@ -52,14 +58,19 @@ namespace HaRepacker.Configuration
         [JsonProperty(PropertyName = "DelayNextLoop")]
         public int DelayNextLoop = 60;
 
-        [JsonProperty(PropertyName = "Plane")]
-        public bool Plane = true;
-
         [JsonProperty(PropertyName = "PlanePosition")]
         public string PlanePosition = "Center";
 
         // Themes
         [JsonProperty(PropertyName = "ThemeColor")]
-        public int ThemeColor = 1;//white = 1, black = 0
+        public int ThemeColor = (int) UserSettingsThemeColor.Light;//white = 1, black = 0
+
+
+        // Settings not shown on the settings page
+        [JsonProperty(PropertyName = "EnableCrossHairDebugInformation")]
+        public bool EnableCrossHairDebugInformation = true;
+
+        [JsonProperty(PropertyName = "ImageZoomLevel")]
+        public double ImageZoomLevel = 3.0f;
     }
 }

@@ -159,10 +159,15 @@
   <ItemGroup>
     <Compile Include="AnimationBuilder.cs" />
     <Compile Include="Comparer\TreeViewNodeSorter.cs" />
-    <Compile Include="Comparer\SemiNumericComparer.cs" />
     <Compile Include="Configuration\ConfigurationManager.cs" />
     <Compile Include="ContextMenuManager.cs" />
     <Compile Include="Converter\BitmapToImageSource.cs" />
+    <Compile Include="Converter\CheckboxToVisibilityConverter.cs" />
+    <Compile Include="Converter\ImageSizeDoubleToIntegerConverter.cs" />
+    <Compile Include="Converter\ImageWidthOrHeightToScreenDPIConverter.cs" />
+    <Compile Include="Converter\PointFOriginToStringConverter.cs" />
+    <Compile Include="Converter\PointFToVisiblityConverter.cs" />
+    <Compile Include="Converter\VectorOriginPointFToMarginConverter.cs" />
     <Compile Include="FHMapper\FHMapper.cs" />
     <Compile Include="GUI\AboutForm.cs">
       <SubType>Form</SubType>
@@ -329,6 +334,9 @@
     <Compile Include="GUI\Panels\SubPanels\FieldLimitPanel.designer.cs">
       <DependentUpon>FieldLimitPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Panels\SubPanels\ImageRenderViewer.xaml.cs">
+      <DependentUpon>ImageRenderViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Panels\SubPanels\LoadingPanel.xaml.cs">
       <DependentUpon>LoadingPanel.xaml</DependentUpon>
     </Compile>
@@ -366,6 +374,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="UndoRedoManager.cs" />
+    <Compile Include="Utils\ScreenDPI.cs" />
     <Compile Include="Warning.cs" />
     <Compile Include="WzFileManager.cs" />
     <Compile Include="GUI\WzStringSearchForm.cs">
@@ -735,6 +744,9 @@
     <Content Include="Resources\arrow_right.png" />
     <None Include="Resources\img_default.png" />
     <Resource Include="Resources\loading.gif" />
+    <None Include="Resources\expand.png" />
+    <None Include="Resources\collapse.png" />
+    <None Include="Resources\ladyboss_test_attack2_0.png" />
     <Content Include="Resources\OrangeMushroom\orangeMushroom_Jump.gif" />
     <Content Include="Resources\OrangeMushroom\orangeMushroom_Stand.gif" />
     <Content Include="Resources\Pause.png" />
@@ -745,6 +757,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GUI\Panels\SubPanels\ChangeableTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Panels\SubPanels\ImageRenderViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
