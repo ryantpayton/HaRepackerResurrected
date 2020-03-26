@@ -25,6 +25,8 @@ using System.Windows.Threading;
 using Win32;
 using HaRepacker.GUI.Panels;
 using HaRepacker.GUI.Input;
+using static HaRepacker.Configuration.UserSettings;
+using System.Reflection;
 
 namespace HaRepacker.GUI
 {
@@ -104,12 +106,15 @@ namespace HaRepacker.GUI
                     {
                         try
                         {
-                            NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", Program.pipeName, PipeDirection.Out);
-                            clientPipe.Connect(0);
-                            StreamWriter sw = new StreamWriter(clientPipe);
-                            sw.WriteLine(wzToLoad);
-                            clientPipe.WaitForPipeDrain();
-                            sw.Close();
+                            using (NamedPipeClientStream clientPipe = new NamedPipeClientStream(".", Program.pipeName, PipeDirection.Out))
+                            {
+                                clientPipe.Connect(0);
+                                using (StreamWriter sw = new StreamWriter(clientPipe))
+                                {
+                                    sw.WriteLine(wzToLoad);
+                                }
+                                clientPipe.WaitForPipeDrain();
+                            }
                             Environment.Exit(0);
                         }
                         catch (TimeoutException)
@@ -147,7 +152,7 @@ namespace HaRepacker.GUI
         #region Theme colors
         public void SetThemeColor()
         {
-            if (Program.ConfigurationManager.UserSettings.ThemeColor == 0)//black
+            if (Program.ConfigurationManager.UserSettings.ThemeColor == (int) UserSettingsThemeColor.Dark)//black
             {
                 this.BackColor = Color.Black;
                 mainMenu.BackColor = Color.Black;
@@ -190,10 +195,14 @@ namespace HaRepacker.GUI
         {
             try
             {
+                WzFile loadedWzFile;
                 if (detectMapleVersion)
-                    Program.WzMan.LoadWzFile(path, panel);
+                    loadedWzFile = Program.WzMan.LoadWzFile(path);
                 else
-                    Program.WzMan.LoadWzFile(path, (WzMapleVersion)encryptionBox.SelectedIndex, MainPanel);
+                    loadedWzFile = Program.WzMan.LoadWzFile(path, (WzMapleVersion)encryptionBox.SelectedIndex);
+
+                if (loadedWzFile != null)
+                    Program.WzMan.AddLoadedWzFileToMainPanel(loadedWzFile, panel);
             }
             catch
             {
@@ -536,7 +545,7 @@ namespace HaRepacker.GUI
                             foreach (string filePath_Others in otherMobWzFiles)
                             {
                                 if (filePath_Others != filePath &&
-                                    filePath_Others.EndsWith("Mob2.wz"))
+                                    (filePath_Others.EndsWith("Mob001.wz") || filePath_Others.EndsWith("Mob2.wz")))
                                 {
                                     wzfilePathsToLoad.Add(filePath_Others);
                                 }
@@ -565,21 +574,38 @@ namespace HaRepacker.GUI
                 // Load all original WZ files 
                 await Task.Run(() =>
                 {
-                    Parallel.ForEach(wzfilePathsToLoad, filePath =>
+                    List<WzFile> loadedWzFiles = new List<WzFile>();
+                    ParallelLoopResult loop = Parallel.ForEach(wzfilePathsToLoad, filePath =>
                     {
-                        WzFile f = Program.WzMan.LoadWzFile(filePath, MapleVersionEncryptionSelected, MainPanel, currentDispatcher);
+                        WzFile f = Program.WzMan.LoadWzFile(filePath, MapleVersionEncryptionSelected);
                         if (f == null)
                         {
                             errorOpeningFile_Admin = true;
                         }
+                        else
+                        {
+                            lock (loadedWzFiles)
+                            {
+                                loadedWzFiles.Add(f);
+                            }
+                        }
                     });
-
-                    // error opening one of the files
-                    if (errorOpeningFile_Admin)
+                    while (!loop.IsCompleted)
                     {
-                        MessageBox.Show(HaRepacker.Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
+                        Thread.Sleep(500);
+                    }
+
+                    foreach (WzFile wzFile in loadedWzFiles) // add later, once everything is loaded to memory
+                    {
+                        Program.WzMan.AddLoadedWzFileToMainPanel(wzFile, MainPanel, currentDispatcher);
                     }
                 }); // load complete
+
+                // error opening one of the files
+                if (errorOpeningFile_Admin) // got to be called after await Task.run()
+                {
+                    MessageBox.Show(HaRepacker.Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
+                }
 
                 // Hide panel splash sdcreen
                 MainPanel.OnSetPanelLoadingCompleted();
@@ -707,6 +733,12 @@ namespace HaRepacker.GUI
         {
             Program.ConfigurationManager.ApplicationSettings.WindowMaximized = WindowState == FormWindowState.Maximized;
             e.Cancel = !Warning.Warn(HaRepacker.Properties.Resources.MainConfirmExit);
+
+            // Save app settings quickly
+            if (!e.Cancel)
+            {
+                Program.ConfigurationManager.Save();
+            }
         }
         #endregion
 
@@ -776,12 +808,16 @@ namespace HaRepacker.GUI
 
             foreach (WzImage img in imgsToDump)
             {
-                serializer.SerializeImage(img, Path.Combine(baseDir, img.Name));
+                string escapedPath = Path.Combine(baseDir, ProgressingWzSerializer.EscapeInvalidFilePathNames(img.Name));
+
+                serializer.SerializeImage(img, escapedPath);
                 UpdateProgressBar(MainPanel.mainProgressBar, 1, false, false);
             }
             foreach (WzDirectory dir in dirsToDump)
             {
-                serializer.SerializeDirectory(dir, Path.Combine(baseDir, dir.Name));
+                string escapedPath = Path.Combine(baseDir, ProgressingWzSerializer.EscapeInvalidFilePathNames(dir.Name));
+
+                serializer.SerializeDirectory(dir, escapedPath);
                 UpdateProgressBar(MainPanel.mainProgressBar, 1, false, false);
             }
             threadDone = true;
@@ -1183,11 +1219,21 @@ namespace HaRepacker.GUI
         /// <param name="e"></param>
         private void toolStripMenuItem_WzEncryption_Click(object sender, EventArgs e)
         {
-            ZLZPacketEncryptionKeyForm form = new ZLZPacketEncryptionKeyForm();
-            bool opened = form.OpenZLZDllFile();
+            AssemblyName executingAssemblyName = Assembly.GetExecutingAssembly().GetName();
+            //similarly to find process architecture  
+            var assemblyArchitecture = executingAssemblyName.ProcessorArchitecture;
 
-            if (opened)
-                form.Show();
+            if (assemblyArchitecture == ProcessorArchitecture.X86)
+            {
+                ZLZPacketEncryptionKeyForm form = new ZLZPacketEncryptionKeyForm();
+                bool opened = form.OpenZLZDllFile();
+
+                if (opened)
+                    form.Show();
+            } else
+            {
+                MessageBox.Show(HaRepacker.Properties.Resources.ExecutingAssemblyError, HaRepacker.Properties.Resources.Warning, MessageBoxButtons.OK);
+            }
         }
         #endregion
 

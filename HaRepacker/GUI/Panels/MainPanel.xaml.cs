@@ -5,6 +5,7 @@ using MapleLib.WzLib;
 using MapleLib.WzLib.WzProperties;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -20,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static HaRepacker.Configuration.UserSettings;
 
 namespace HaRepacker.GUI.Panels
 {
@@ -49,7 +51,7 @@ namespace HaRepacker.GUI.Panels
             undoRedoMan = new UndoRedoManager(this);
 
             // Set theme color
-            if (Program.ConfigurationManager.UserSettings.ThemeColor == 0)
+            if (Program.ConfigurationManager.UserSettings.ThemeColor == (int)UserSettingsThemeColor.Dark)
             {
                 VisualStateManager.GoToState(this, "BlackTheme", false);
                 DataTree.BackColor = System.Drawing.Color.Black;
@@ -64,19 +66,6 @@ namespace HaRepacker.GUI.Panels
 
             textPropBox.Visibility = Visibility.Collapsed;
             //nameBox.Visibility = Visibility.Collapsed;
-
-            bool planeEnable = Program.ConfigurationManager.UserSettings.Plane;
-            cartesianPlane_checkBox.IsChecked = planeEnable;
-            grid_planVisibility.Visibility = planeEnable ? Visibility.Visible : Visibility.Collapsed;
-
-            foreach (ComboBoxItem comboboxItem in planePosition_comboBox.Items)
-            {
-                if (Program.ConfigurationManager.UserSettings.PlanePosition == comboboxItem.Tag as string)
-                {
-                    planePosition_comboBox.SelectedItem = comboboxItem;
-                    break;
-                }
-            }
 
             // Storyboard
             System.Windows.Media.Animation.Storyboard sbb = (System.Windows.Media.Animation.Storyboard)(this.FindResource("Storyboard_Find_FadeIn"));
@@ -564,6 +553,7 @@ namespace HaRepacker.GUI.Panels
             {
                 loadingPanel.OnStartAnimate();
                 grid_LoadingPanel.Visibility = Visibility.Visible;
+                treeView_WinFormsHost.Visibility = Visibility.Collapsed;
             };
             grid_LoadingPanel.Dispatcher.BeginInvoke(action);
         }
@@ -577,134 +567,13 @@ namespace HaRepacker.GUI.Panels
             {
                 loadingPanel.OnPauseAnimate();
                 grid_LoadingPanel.Visibility = Visibility.Collapsed;
+                treeView_WinFormsHost.Visibility = Visibility.Visible;
             };
             grid_LoadingPanel.Dispatcher.BeginInvoke(action);
         }
         #endregion
 
-        #region X Y Center Plane
-        /// <summary>
-        /// Show cartesian plane Checked
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cartesianPlane_checkBox_CheckUnchecked(object sender, RoutedEventArgs e)
-        {
-            if (isLoading || cartesianPlane_checkBox == null)
-                return;
-
-            bool enable = cartesianPlane_checkBox.IsChecked == true;
-
-            Program.ConfigurationManager.UserSettings.Plane = enable;
-
-            grid_planVisibility.Visibility = enable ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        /// <summary>
-        /// Plane alignment
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void planePosition_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (isLoading || planePosition_comboBox.SelectedItem == null)
-                return;
-
-            Program.ConfigurationManager.UserSettings.PlanePosition = ((ComboBoxItem)planePosition_comboBox.SelectedItem).Tag as string;
-            //   planePosition();
-            UpdateCartesianPlanePosition(new System.Drawing.PointF());
-        }
-
-        private void UpdateCartesianPlanePosition(System.Drawing.PointF vectorSelected)
-        {
-            if (vectorSelected == null || isLoading || cartesianPlaneX == null || cartesianPlaneY == null)
-                return;
-
-            double xCenter = Grid_ImageDisplay.ActualWidth / 2d;
-            double yCenter = Grid_ImageDisplay.ActualWidth / 2d;
-            double imageWidth = canvasPropBox.ActualWidth;
-            double imageHeight = canvasPropBox.ActualHeight;
-
-            canvasPropBox.Margin = new Thickness(imageWidth, imageHeight, 0, 0);
-
-            switch (Program.ConfigurationManager.UserSettings.PlanePosition)
-            {
-                case "Top":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Top;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Center;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Top;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Center;
-                    break;
-                case "Bottom":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Bottom;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Center;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Bottom;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Center;
-                    break;
-                case "Right":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Center;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Right;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Center;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Right;
-                    break;
-                case "Left":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Center;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Left;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Center;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Left;
-                    break;
-                case "Top-Left":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Top;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Left;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Top;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Left;
-                    break;
-                case "Top-Right":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Top;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Right;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Top;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Right;
-                    break;
-                case "Bottom-Left":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Bottom;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Left;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Bottom;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Left;
-                    break;
-                case "Bottom-Right":
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Bottom;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Right;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Bottom;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Right;
-                    break;
-                case "Center":
-                default:
-                    canvasPropBox.VerticalAlignment = VerticalAlignment.Center;
-                    canvasPropBox.HorizontalAlignment = HorizontalAlignment.Center;
-
-                    cartesianPlaneX.VerticalAlignment = VerticalAlignment.Center;
-                    cartesianPlaneY.HorizontalAlignment = HorizontalAlignment.Center;
-                    break;
-            }
-
-            canvasPropBox.Margin = new Thickness(
-                vectorOriginSelected.X,  // Left
-                vectorOriginSelected.Y,  // Top
-                0,  // Right
-                0);
-        }
-        #endregion
-
         #region Animate
-        private System.Drawing.PointF vectorOriginSelected;
         /// <summary>
         /// On button click for animating canvas
         /// </summary>
@@ -718,7 +587,7 @@ namespace HaRepacker.GUI.Panels
         private DispatcherTimer timerImgSequence;
         private int i_animateCanvasNode = 0;
         private bool bCanvasAnimationActive = false;
-        private List<Tuple<string, int, System.Drawing.PointF, ImageSource>> animate_PreLoadImages = new List<Tuple<string, int, System.Drawing.PointF, ImageSource>>(); // list of pre-loaded images for animation [Image name, delay, origin, image]
+        private List<CanvasAnimationFrame> animate_PreLoadImages = new List<CanvasAnimationFrame>(); // list of pre-loaded images for animation [Image name, delay, origin, image]
         /// <summary>
         /// Animate the list of selected canvases
         /// </summary>
@@ -739,7 +608,7 @@ namespace HaRepacker.GUI.Panels
             }
             else if (DataTree.SelectedNodes.Count >= 1)
             {
-                List<Tuple<string, int, System.Drawing.PointF, ImageSource>> load_animate_PreLoadImages = new List<Tuple<string, int, System.Drawing.PointF, ImageSource>>();
+                List<CanvasAnimationFrame> load_animate_PreLoadImages = new List<CanvasAnimationFrame>();
 
                 // Check all selected nodes, make sure they're all images.
                 // and add to a list
@@ -783,10 +652,16 @@ namespace HaRepacker.GUI.Panels
                         if (delay == null)
                             delay = 0;
 
-                        System.Drawing.PointF origin = canvasProperty.GetCanvasVectorPosition();
-
                         // Add to the list of images to render
-                        load_animate_PreLoadImages.Add(new Tuple<string, int, System.Drawing.PointF, ImageSource>(obj.Name, (int)delay, origin, BitmapToImageSource.ToWpfBitmap(image)));
+                        load_animate_PreLoadImages.Add(new CanvasAnimationFrame()
+                        {
+                            Name = obj.Name,
+                            Delay = (int)delay,
+                            origin = canvasProperty.GetCanvasOriginPosition(),
+                            head = canvasProperty.GetCanvasHeadPosition(),
+                            lt = canvasProperty.GetCanvasLtPosition(),
+                            Image = BitmapToImageSource.ToWpfBitmap(image)
+                        });
                     }
                     else
                     {
@@ -806,7 +681,7 @@ namespace HaRepacker.GUI.Panels
                         animate_PreLoadImages.Clear();
 
                     // Sort by image name
-                    IOrderedEnumerable<Tuple<string, int, System.Drawing.PointF, ImageSource>> sorted = load_animate_PreLoadImages.OrderBy(x => x, new SemiNumericComparer());
+                    IOrderedEnumerable<CanvasAnimationFrame> sorted = load_animate_PreLoadImages.OrderBy(x => x, new SemiNumericComparer());
                     animate_PreLoadImages.Clear(); // clear existing
                     animate_PreLoadImages.AddRange(sorted);
 
@@ -837,22 +712,18 @@ namespace HaRepacker.GUI.Panels
                 i_animateCanvasNode = 0;
             }
 
-            Tuple<string, int, System.Drawing.PointF, ImageSource> currentNode = animate_PreLoadImages[i_animateCanvasNode];
+            CanvasAnimationFrame currentSelectedFrame = animate_PreLoadImages[i_animateCanvasNode];
             i_animateCanvasNode++; // increment 1
 
-            // Set vector origin
-            vectorOriginSelected = currentNode.Item3;
-
-            // Set current image
-            canvasPropBox.Source = currentNode.Item4;
+            SetImageRenderView(null, currentSelectedFrame);
 
             // Set tooltip text
             if (i_animateCanvasNode == animate_PreLoadImages.Count)
-                statusBarItemLabel_Others.Text = "# " + currentNode.Item1 + ", Delay: " + currentNode.Item2 + " ms. Repeating Animate.";
+                statusBarItemLabel_Others.Text = "# " + currentSelectedFrame.Name + ", Delay: " + currentSelectedFrame.Delay + " ms. Repeating Animate.";
             else
-                statusBarItemLabel_Others.Text = "# " + currentNode.Item1 + ", Delay: " + currentNode.Item2 + " ms.";
+                statusBarItemLabel_Others.Text = "# " + currentSelectedFrame.Name + ", Delay: " + currentSelectedFrame.Delay + " ms.";
 
-            timerImgSequence.Interval = new TimeSpan(0, 0, 0, 0, currentNode.Item2);
+            timerImgSequence.Interval = new TimeSpan(0, 0, 0, 0, currentSelectedFrame.Delay);
             timerImgSequence.Start();
         }
 
@@ -874,6 +745,57 @@ namespace HaRepacker.GUI.Panels
             animate_PreLoadImages.Clear();
 
             bCanvasAnimationActive = false; // flag
+        }
+
+        private class CanvasAnimationFrame
+        {
+            public string Name;
+            public int Delay;
+            public PointF origin, head, lt;
+            public ImageSource Image;
+        }
+
+        /// <summary>
+        /// Comparer for string names. in ascending order
+        /// Compares by Numeric when possible, so it does not sort by name.
+        /// </summary>
+        private class SemiNumericComparer : IComparer<CanvasAnimationFrame>
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int Compare(CanvasAnimationFrame s1, CanvasAnimationFrame s2)
+            {
+                string s1Text = s1.Name;
+                string s2Text = s2.Name;
+
+                bool isS1Numeric = IsNumeric(s1Text);
+                bool isS2Numeric = IsNumeric(s2Text);
+
+                if (isS1Numeric && isS2Numeric)
+                {
+                    int s1val = Convert.ToInt32(s1Text);
+                    int s2val = Convert.ToInt32(s2Text);
+
+                    if (s1val > s2val)
+                        return 1;
+                    else if (s1val < s2val)
+                        return -1;
+                    else if (s1val == s2val)
+                        return 0;
+                }
+                else if (isS1Numeric && !isS2Numeric)
+                    return -1;
+                else if (!isS1Numeric && isS2Numeric)
+                    return 1;
+
+                return string.Compare(s1Text, s2Text, true);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static bool IsNumeric(string value)
+            {
+                int parseInt = 0;
+                return Int32.TryParse(value, out parseInt);
+            }
         }
 
         private void nextLoopTime_comboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1031,7 +953,8 @@ namespace HaRepacker.GUI.Panels
             System.Drawing.Bitmap wzCanvasPropertyObjLocation = null;
             string fileName = string.Empty;
 
-            if (DataTree.SelectedNode.Tag is WzCanvasProperty) {
+            if (DataTree.SelectedNode.Tag is WzCanvasProperty)
+            {
                 WzCanvasProperty canvas = (WzCanvasProperty)DataTree.SelectedNode.Tag;
 
                 wzCanvasPropertyObjLocation = canvas.GetLinkedWzCanvasBitmap();
@@ -1135,13 +1058,18 @@ namespace HaRepacker.GUI.Panels
 
                 // Updates
                 selectedWzCanvas.ParentImage.Changed = true;
-                canvasPropBox.Source = new BitmapImage(new Uri(dialog.FileName));
+                canvasPropBox.Image = new BitmapImage(new Uri(dialog.FileName));
 
                 // Add undo actions
                 //UndoRedoMan.AddUndoBatch(actions);
             }
         }
 
+        /// <summary>
+        /// Change sound button onClicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void changeSoundButton_Click(object sender, RoutedEventArgs e)
         {
             if (DataTree.SelectedNode.Tag is WzSoundProperty)
@@ -1218,7 +1146,7 @@ namespace HaRepacker.GUI.Panels
             clipboard.Clear();
             Parallel.ForEach(DataTree.SelectedNodes.ToArray(), node =>
             {
-                WzObject clone = CloneWzObject((WzObject) ((WzNode)node).Tag);
+                WzObject clone = CloneWzObject((WzObject)((WzNode)node).Tag);
                 if (clone != null)
                     clipboard.Add(clone);
             });
@@ -1325,8 +1253,6 @@ namespace HaRepacker.GUI.Panels
                 isSelectingWzMapFieldLimit = false;
             }
 
-            vectorOriginSelected = new System.Drawing.PointF(0, 0);
-
             // Canvas animation
             if (DataTree.SelectedNodes.Count <= 1)
                 button_animateSelectedCanvas.Visibility = Visibility.Collapsed; // set invisible regardless if none of the nodes are selected.
@@ -1377,16 +1303,12 @@ namespace HaRepacker.GUI.Panels
                 {
                     System.Drawing.Image img = canvas.GetLinkedWzCanvasBitmap();
                     if (img != null)
-                        canvasPropBox.Source = BitmapToImageSource.ToWpfBitmap((System.Drawing.Bitmap)img);
+                        canvasPropBox.Image = BitmapToImageSource.ToWpfBitmap((System.Drawing.Bitmap)img);
                 }
                 else
-                    canvasPropBox.Source = BitmapToImageSource.ToWpfBitmap(canvas.GetBitmap());
+                    canvasPropBox.Image = BitmapToImageSource.ToWpfBitmap(canvas.GetBitmap());
 
-                // origin
-                System.Drawing.PointF origin = canvas.GetCanvasVectorPosition();
-                vectorOriginSelected = origin;
-
-                canvasPropBox.Visibility = Visibility.Visible;
+                SetImageRenderView(canvas, null);
             }
             else if (obj is WzUOLProperty)
             {
@@ -1395,12 +1317,12 @@ namespace HaRepacker.GUI.Panels
                 if (linkValue is WzCanvasProperty)
                 {
                     canvasPropBox.Visibility = Visibility.Visible;
-                    canvasPropBox.Source = BitmapToImageSource.ToWpfBitmap(linkValue.GetBitmap());
+                    canvasPropBox.Image = BitmapToImageSource.ToWpfBitmap(linkValue.GetBitmap());
                     saveImageButton.Visibility = Visibility.Visible;
 
-                    // origin
-                    System.Drawing.PointF origin = ((WzCanvasProperty)linkValue).GetCanvasVectorPosition();
-                    vectorOriginSelected = origin;
+                    WzCanvasProperty linkProperty = ((WzCanvasProperty)linkValue);
+
+                    SetImageRenderView(linkProperty, null);
                 }
 
                 // Value
@@ -1477,6 +1399,38 @@ namespace HaRepacker.GUI.Panels
             else
             {
             }
+        }
+
+        /// <summary>
+        ///  Sets the ImageRender view on clicked, or via animation tick
+        /// </summary>
+        /// <param name="canvas"></param>
+        /// <param name="animationFrame"></param>
+        private void SetImageRenderView(WzCanvasProperty canvas, CanvasAnimationFrame animationFrame)
+        {
+            if (animationFrame != null)
+            {
+                // Set XY point to canvas xaml
+                canvasPropBox.CanvasVectorOrigin = animationFrame.origin;
+                canvasPropBox.CanvasVectorHead = animationFrame.head;
+                canvasPropBox.CanvasVectorLt = animationFrame.lt;
+
+                // Set image
+                canvasPropBox.Image = animationFrame.Image;
+            }
+            else
+            {
+                // origin
+                PointF originVector = canvas.GetCanvasOriginPosition();
+                PointF headVector = canvas.GetCanvasHeadPosition();
+                PointF ltVector = canvas.GetCanvasLtPosition();
+
+                // Set XY point to canvas xaml
+                canvasPropBox.CanvasVectorOrigin = originVector;
+                canvasPropBox.CanvasVectorHead = headVector;
+                canvasPropBox.CanvasVectorLt = ltVector;
+            }
+            canvasPropBox.Visibility = Visibility.Visible;
         }
         #endregion
 
