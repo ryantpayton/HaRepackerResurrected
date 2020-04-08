@@ -472,7 +472,7 @@ namespace MapleLib.WzLib.Serialization
             }
             else if (currObj is IPropertyContainer)
             {
-                outPath += currObj.Name + ".";
+                outPath += ProgressingWzSerializer.EscapeInvalidFilePathNames(currObj.Name) + ".";
                 foreach (WzImageProperty subprop in ((IPropertyContainer)currObj).WzProperties)
                     ExportRecursion(subprop, outPath);
             }

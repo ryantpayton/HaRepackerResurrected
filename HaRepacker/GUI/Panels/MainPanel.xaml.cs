@@ -1032,6 +1032,12 @@ namespace HaRepacker.GUI.Panels
 
                 WzCanvasProperty selectedWzCanvas = (WzCanvasProperty)DataTree.SelectedNode.Tag;
 
+                if (selectedWzCanvas.HaveInlinkProperty() || selectedWzCanvas.HaveOutlinkProperty())
+                {
+                    MessageBox.Show("Cannot change image on a linked image.");
+                    return;
+                }
+
                 if (selectedWzCanvas.HaveInlinkProperty()) // if its an inlink property, remove that before updating base image.
                 {
                     selectedWzCanvas.RemoveProperty(selectedWzCanvas[WzCanvasProperty.InlinkPropertyName]);
