@@ -19,6 +19,7 @@ using System.IO;
 using MapleLib.WzLib.Util;
 using System;
 using System.Diagnostics;
+using MapleLib.PacketLib;
 
 namespace MapleLib.WzLib
 {
@@ -172,9 +173,13 @@ namespace MapleLib.WzLib
 
         /// <summary>
         /// Parses the WzDirectory
+        /// <paramref name="lazyParse">Only parses the first directory</paramref>
         /// </summary>
-        internal void ParseDirectory()
+        internal void ParseDirectory(bool lazyParse = false)
         {
+            //Debug.WriteLine(HexTool.ToString( reader.ReadBytes(20)));
+            //reader.BaseStream.Position = reader.BaseStream.Position - 20;
+
             int entryCount = reader.ReadCompressedInt();
             for (int i = 0; i < entryCount; i++)
             {
@@ -220,6 +225,9 @@ namespace MapleLib.WzLib
                     subDir.Offset = offset;
                     subDir.Parent = this;
                     subDirs.Add(subDir);
+
+                    if (lazyParse)
+                        break;
                 }
                 else
                 {
@@ -229,6 +237,9 @@ namespace MapleLib.WzLib
                     img.Offset = offset;
                     img.Parent = this;
                     images.Add(img);
+
+                    if (lazyParse)
+                        break;
                 }
             }
 

@@ -27,39 +27,14 @@ using HaRepacker.GUI.Panels;
 using HaRepacker.GUI.Input;
 using static HaRepacker.Configuration.UserSettings;
 using System.Reflection;
+using HaRepacker.GUI.Panels.SubPanels;
+using MapleLib.PacketLib;
+using System.Timers;
 
 namespace HaRepacker.GUI
 {
     public partial class MainForm : Form
     {
-        /// <summary>
-        /// Adds the WZ encryption types to ToolstripComboBox.
-        /// Shared code between WzMapleVersionInputBox.cs
-        /// </summary>
-        /// <param name="encryptionBox"></param>
-        public static void AddWzEncryptionTypesToComboBox(object encryptionBox)
-        {
-            string[] resources = {
-                HaRepacker.Properties.Resources.EncTypeGMS,
-                HaRepacker.Properties.Resources.EncTypeMSEA,
-                HaRepacker.Properties.Resources.EncTypeNone
-            };
-            if (encryptionBox is ToolStripComboBox)
-            {
-                foreach (string res in resources)
-                {
-                    ((ToolStripComboBox)encryptionBox).Items.Add(res);
-                }
-            }
-            else
-            {
-                foreach (string res in resources)
-                {
-                    ((ComboBox)encryptionBox).Items.Add(res);
-                }
-            }
-        }
-
         private bool mainFormLoaded = false;
 
         private MainPanel MainPanel = null;
@@ -71,7 +46,6 @@ namespace HaRepacker.GUI
             AddTabsInternal("Default");
 
             // Events
-            Load += MainForm_Load1;
 #if DEBUG
             debugToolStripMenuItem.Visible = true;
 #endif
@@ -81,6 +55,9 @@ namespace HaRepacker.GUI
 
             // encryptions
             AddWzEncryptionTypesToComboBox(encryptionBox);
+            // Set encryption box
+            SetWzEncryptionBoxSelectionByWzMapleVersion(Program.ConfigurationManager.ApplicationSettings.MapleVersion);
+
 
             WindowState = Program.ConfigurationManager.ApplicationSettings.WindowMaximized ? FormWindowState.Maximized : FormWindowState.Normal;
             Size = new Size(
@@ -127,7 +104,8 @@ namespace HaRepacker.GUI
             {
                 short version;
                 WzMapleVersion encVersion = WzTool.DetectMapleVersion(wzToLoad, out version);
-                encryptionBox.SelectedIndex = (int)encVersion;
+                SetWzEncryptionBoxSelectionByWzMapleVersion(encVersion);
+
                 LoadWzFileThreadSafe(wzToLoad, MainPanel, false);
             }
             ContextMenuManager manager = new ContextMenuManager(MainPanel, MainPanel.UndoRedoMan);
@@ -138,10 +116,6 @@ namespace HaRepacker.GUI
 
             // flag. loaded
             mainFormLoaded = true;
-        }
-
-        private void MainForm_Load1(object sender, EventArgs e)
-        {
         }
 
         public void Interop_AddLoadedWzFileToManager(WzFile f)
@@ -190,6 +164,137 @@ namespace HaRepacker.GUI
         }
         #endregion
 
+        #region Wz Encryption selection combobox
+        /// <summary>
+        /// Adds the WZ encryption types to ToolstripComboBox.
+        /// Shared code between WzMapleVersionInputBox.cs
+        /// </summary>
+        /// <param name="encryptionBox"></param>
+        public static void AddWzEncryptionTypesToComboBox(object encryptionBox)
+        {
+            string[] resources = {
+                HaRepacker.Properties.Resources.EncTypeGMS,
+                HaRepacker.Properties.Resources.EncTypeMSEA,
+                HaRepacker.Properties.Resources.EncTypeNone,
+                HaRepacker.Properties.Resources.EncTypeCustom,
+                 HaRepacker.Properties.Resources.EncTypeGenerate,
+            };
+            bool isToolStripComboBox = encryptionBox is ToolStripComboBox;
+
+            int i = 0;
+            foreach (string res in resources)
+            {
+                if (isToolStripComboBox)
+                    ((ToolStripComboBox)encryptionBox).Items.Add(res); // in mainform
+                else
+                {
+                    if (i != 4) // dont show bruteforce option in SaveForm
+                    {
+                        ((ComboBox)encryptionBox).Items.Add(res); // in saveForm
+                    }
+                }
+                i++;
+            }
+        }
+
+        /// <summary>
+        /// On encryption box selection changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void encryptionBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!mainFormLoaded) // first run during app startup
+            {
+                return;
+            }
+
+            int selectedIndex = encryptionBox.SelectedIndex;
+            WzMapleVersion wzMapleVer = GetWzMapleVersionByWzEncryptionBoxSelection(selectedIndex);
+            Program.ConfigurationManager.ApplicationSettings.MapleVersion = wzMapleVer;
+
+            if (wzMapleVer == WzMapleVersion.CUSTOM)
+            {
+                CustomWZEncryptionInputBox customWzInputBox = new CustomWZEncryptionInputBox();
+                customWzInputBox.ShowDialog();
+            }
+        }
+
+        /// <summary>
+        /// Gets the WzMapleVersion enum by encryptionBox selection index
+        /// </summary>
+        /// <param name="selectedIndex"></param>
+        /// <returns></returns>
+        public static WzMapleVersion GetWzMapleVersionByWzEncryptionBoxSelection(int selectedIndex)
+        {
+            WzMapleVersion wzMapleVer = WzMapleVersion.CUSTOM;
+            switch (selectedIndex)
+            {
+                case 0:
+                    wzMapleVer = WzMapleVersion.GMS;
+                    break;
+                case 1:
+                    wzMapleVer = WzMapleVersion.EMS;
+                    break;
+                case 2:
+                    wzMapleVer = WzMapleVersion.BMS;
+                    break;
+                case 3:
+                    wzMapleVer = WzMapleVersion.CUSTOM;
+                    break;
+                case 4:
+                    wzMapleVer = WzMapleVersion.GENERATE;
+                    break;
+                default: // hmm?
+                    wzMapleVer = WzMapleVersion.BMS; // just default anyway to modern maplestory
+                    break;
+            }
+            return wzMapleVer;
+        }
+
+        /// <summary>
+        /// Gets the Combobox selection index by WzMapleVersion
+        /// </summary>
+        /// <param name="versionSelected"></param>
+        /// <param name="fromNewForm">Called from NewForm.cs</param>
+        /// <returns></returns>
+        public static int GetIndexByWzMapleVersion(WzMapleVersion versionSelected, bool fromNewForm = false)
+        {
+            int setIndex = 0;
+            switch (versionSelected)
+            {
+                case WzMapleVersion.GMS:
+                    setIndex = 0;
+                    break;
+                case WzMapleVersion.EMS:
+                    setIndex = 1;
+                    break;
+                case WzMapleVersion.BMS:
+                    setIndex = 2;
+                    break;
+                case WzMapleVersion.CUSTOM:
+                    setIndex = 3;
+                    break;
+                case WzMapleVersion.GENERATE:
+                    if (fromNewForm) // dont return GENERATE, as that option is unavailable when creating a new WZ via NewForm.
+                        setIndex = 2; // BMS
+                    else 
+                        setIndex = 4;
+                    break;
+            }
+            return setIndex;
+        }
+
+        /// <summary>
+        /// Sets the ComboBox selection index by WzMapleVersion enum
+        /// </summary>
+        /// <param name="versionSelected"></param>
+        private void SetWzEncryptionBoxSelectionByWzMapleVersion(WzMapleVersion versionSelected)
+        {
+            encryptionBox.SelectedIndex = GetIndexByWzMapleVersion(versionSelected);
+        }
+        #endregion
+
         private delegate void LoadWzFileDelegate(string path, MainPanel panel, bool detectMapleVersion);
         private void LoadWzFileCallback(string path, MainPanel panel, bool detectMapleVersion)
         {
@@ -199,7 +304,7 @@ namespace HaRepacker.GUI
                 if (detectMapleVersion)
                     loadedWzFile = Program.WzMan.LoadWzFile(path);
                 else
-                    loadedWzFile = Program.WzMan.LoadWzFile(path, (WzMapleVersion)encryptionBox.SelectedIndex);
+                    loadedWzFile = Program.WzMan.LoadWzFile(path, (WzMapleVersion) GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex));
 
                 if (loadedWzFile != null)
                     Program.WzMan.AddLoadedWzFileToMainPanel(loadedWzFile, panel);
@@ -294,7 +399,6 @@ namespace HaRepacker.GUI
         #region Handlers
         private void MainForm_Load(object sender, EventArgs e)
         {
-            encryptionBox.SelectedIndex = (int)Program.ConfigurationManager.ApplicationSettings.MapleVersion;
             if (Program.ConfigurationManager.UserSettings.AutoUpdate && Program.ConfigurationManager.ApplicationSettings.UpdateServer != "")
             {
                 updater = new Thread(new ThreadStart(UpdaterThread));
@@ -477,12 +581,165 @@ namespace HaRepacker.GUI
             // Focus on that tab control
             tabControl_MainPanels.Focus();
         }
+        #endregion
 
-        private void encryptionBox_SelectedIndexChanged(object sender, EventArgs e)
+        #region Wz Key bruteforcing
+        private ulong wzKeyBruteforceTries = 0;
+        private DateTime wzKeyBruteforceStartTime = DateTime.Now;
+        private bool wzKeyBruteforceCompleted = false;
+
+        private System.Timers.Timer aTimer_wzKeyBruteforce = null;
+
+        /// <summary>
+        /// Find needles in a haystack o_O
+        /// </summary>
+        /// <param name="currentDispatcher"></param>
+        private void StartWzKeyBruteforcing(Dispatcher currentDispatcher)
         {
-            Program.ConfigurationManager.ApplicationSettings.MapleVersion = (WzMapleVersion)encryptionBox.SelectedIndex;
+            // Generate WZ keys via a test WZ file
+            using (OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Title = HaRepacker.Properties.Resources.SelectWz,
+                Filter = string.Format("{0}|TamingMob.wz", HaRepacker.Properties.Resources.WzFilter), // Use the smallest possible file
+                Multiselect = false
+            })
+            {
+                if (dialog.ShowDialog() != DialogResult.OK)
+                    return;
+
+                // Show splash screen
+                MainPanel.OnSetPanelLoading(currentDispatcher);
+                MainPanel.loadingPanel.SetWzIvBruteforceStackpanelVisiblity(System.Windows.Visibility.Visible);
+
+
+                // Reset variables
+                wzKeyBruteforceTries = 0;
+                wzKeyBruteforceStartTime = DateTime.Now;
+                wzKeyBruteforceCompleted = false;
+
+
+                int processorCount = Environment.ProcessorCount * 3; // 8 core = 16 (with ht, smt) , multiply by 3 seems to be the magic number. it falls off after 4
+                List<int> cpuIds = new List<int>();
+                for (int cpuId_ = 0; cpuId_ < processorCount; cpuId_++)
+                {
+                    cpuIds.Add(cpuId_);
+                }
+
+                // UI update thread
+                if (aTimer_wzKeyBruteforce != null)
+                {
+                    aTimer_wzKeyBruteforce.Stop();
+                    aTimer_wzKeyBruteforce = null;
+                }
+                aTimer_wzKeyBruteforce = new System.Timers.Timer();
+                aTimer_wzKeyBruteforce.Elapsed += new ElapsedEventHandler(OnWzIVKeyUIUpdateEvent);
+                aTimer_wzKeyBruteforce.Interval = 5000;
+                aTimer_wzKeyBruteforce.Enabled = true;
+
+
+                // Key finder thread
+                Task.Run(() =>
+                {
+                    Thread.Sleep(3000); // delay 3 seconds before starting
+
+                    var parallelOption = new ParallelOptions
+                    {
+                        MaxDegreeOfParallelism = processorCount,
+                    };
+                    ParallelLoopResult loop = Parallel.ForEach(cpuIds, parallelOption, cpuId =>
+                    {
+                        wzKeyBruteforceComputeTask(cpuId, processorCount, dialog, currentDispatcher);
+                    });
+                });
+            }
         }
 
+        /// <summary>
+        /// UI Updating thread
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        private void OnWzIVKeyUIUpdateEvent(object source, ElapsedEventArgs e)
+        {
+            if (aTimer_wzKeyBruteforce == null)
+                return;
+            if (wzKeyBruteforceCompleted)
+            {
+                aTimer_wzKeyBruteforce.Stop();
+                aTimer_wzKeyBruteforce = null;
+
+                MainPanel.loadingPanel.SetWzIvBruteforceStackpanelVisiblity(System.Windows.Visibility.Collapsed);
+            }
+
+            MainPanel.loadingPanel.WzIvKeyDuration = DateTime.Now.Ticks - wzKeyBruteforceStartTime.Ticks;
+            MainPanel.loadingPanel.WzIvKeyTries = wzKeyBruteforceTries;
+        }
+
+        /// <summary>
+        /// Internal compute task for figuring out the WzKey automaticagically 
+        /// </summary>
+        /// <param name="cpuId_"></param>
+        /// <param name="processorCount"></param>
+        /// <param name="dialog"></param>
+        /// <param name="currentDispatcher"></param>
+        private void wzKeyBruteforceComputeTask(int cpuId_, int processorCount, OpenFileDialog dialog, Dispatcher currentDispatcher)
+        {
+            int cpuId = cpuId_;
+
+            // try bruteforce keys
+            const long startValue = int.MinValue;
+            const long endValue = int.MaxValue;
+
+            long lookupRangePerCPU = (endValue - startValue) / processorCount;
+
+            Debug.WriteLine("CPUID {0}. Looking up from {1} to {2}. [Range = {3}]  TEST: {4} {5}",
+                cpuId,
+                (startValue + (lookupRangePerCPU * cpuId)),
+                (startValue + (lookupRangePerCPU * (cpuId + 1))),
+                lookupRangePerCPU,
+                (lookupRangePerCPU * cpuId), (lookupRangePerCPU * (cpuId + 1)));
+
+            for (long i = (startValue + (lookupRangePerCPU * cpuId)); i < (startValue + (lookupRangePerCPU * (cpuId + 1))); i++)  // 2 bill key pairs? o_O
+            {
+                if (wzKeyBruteforceCompleted)
+                    break;
+
+                byte[] bytes = new byte[4];
+                unsafe
+                {
+                    fixed (byte* pbytes = &bytes[0])
+                    {
+                        *(int*)pbytes = (int) i;
+                    }
+                }
+                bool tryDecrypt = WzTool.TryBruteforcingWzIVKey(dialog.FileName, bytes);
+                //Debug.WriteLine("{0} = {1}", cpuId, HexTool.ToString(new PacketWriter(bytes).ToArray()));
+                if (tryDecrypt)
+                {
+                    wzKeyBruteforceCompleted = true;
+
+                    // Hide panel splash sdcreen
+                    Action action = () =>
+                    {
+                        MainPanel.OnSetPanelLoadingCompleted(currentDispatcher);
+                        MainPanel.loadingPanel.SetWzIvBruteforceStackpanelVisiblity(System.Windows.Visibility.Collapsed);
+                    };
+                    currentDispatcher.BeginInvoke(action);
+
+
+                    PacketWriter writer = new PacketWriter(4);
+                    writer.WriteBytes(bytes);
+                    MessageBox.Show("Found the encryption key to the WZ file:\r\n" + HexTool.ToString(writer.ToArray()), "Success");
+                    Debug.WriteLine("Found key. Key = " + HexTool.ToString(writer.ToArray()));
+
+                    break;
+                }
+                wzKeyBruteforceTries++;
+            }
+        }
+        #endregion
+
+        #region Toolstrip Menu items
         /// <summary>
         /// Open file
         /// </summary>
@@ -490,6 +747,16 @@ namespace HaRepacker.GUI
         /// <param name="e"></param>
         private async void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Dispatcher currentDispatcher = Dispatcher.CurrentDispatcher;
+
+            WzMapleVersion MapleVersionEncryptionSelected = GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex);
+            if (MapleVersionEncryptionSelected == WzMapleVersion.GENERATE)
+            {
+                StartWzKeyBruteforcing(currentDispatcher); // find needles in a haystack
+                return;
+            }
+
+            // Load WZ file
             using (OpenFileDialog dialog = new OpenFileDialog()
             {
                 Title = HaRepacker.Properties.Resources.SelectWz,
@@ -502,10 +769,7 @@ namespace HaRepacker.GUI
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
-                bool errorOpeningFile_Admin = false;
                 List<string> wzfilePathsToLoad = new List<string>();
-
-                WzMapleVersion MapleVersionEncryptionSelected = (WzMapleVersion)encryptionBox.SelectedIndex;
                 foreach (string filePath in dialog.FileNames)
                 {
                     string filePathLowerCase = filePath.ToLower();
@@ -515,7 +779,7 @@ namespace HaRepacker.GUI
                         WzImage img = Program.WzMan.LoadDataWzHotfixFile(filePath, MapleVersionEncryptionSelected, MainPanel);
                         if (img == null)
                         {
-                            errorOpeningFile_Admin = true;
+                            MessageBox.Show(HaRepacker.Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
                             break;
                         }
                     }
@@ -569,8 +833,8 @@ namespace HaRepacker.GUI
                 // Show splash screen
                 MainPanel.OnSetPanelLoading();
 
-                //
-                Dispatcher currentDispatcher = Dispatcher.CurrentDispatcher;
+                // Try opening one, to see if the user is having the right priviledge
+
                 // Load all original WZ files 
                 await Task.Run(() =>
                 {
@@ -580,7 +844,7 @@ namespace HaRepacker.GUI
                         WzFile f = Program.WzMan.LoadWzFile(filePath, MapleVersionEncryptionSelected);
                         if (f == null)
                         {
-                            errorOpeningFile_Admin = true;
+                            // error should be thrown 
                         }
                         else
                         {
@@ -601,12 +865,6 @@ namespace HaRepacker.GUI
                     }
                 }); // load complete
 
-                // error opening one of the files
-                if (errorOpeningFile_Admin) // got to be called after await Task.run()
-                {
-                    MessageBox.Show(HaRepacker.Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
-                }
-
                 // Hide panel splash sdcreen
                 MainPanel.OnSetPanelLoadingCompleted();
             }
@@ -624,10 +882,16 @@ namespace HaRepacker.GUI
                 Program.WzMan.ReloadAll(MainPanel);
         }
 
+        /// <summary>
+        /// Field/ map rendering
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void renderMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MainPanel.DataTree.SelectedNode == null)
                 return;
+
             if (MainPanel.DataTree.SelectedNode.Tag is WzImage)
             {
                 double zoomLevel = double.Parse(zoomTextBox.TextBox.Text);
@@ -729,6 +993,11 @@ namespace HaRepacker.GUI
             }
         }
 
+        /// <summary>
+        /// On closing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Program.ConfigurationManager.ApplicationSettings.WindowMaximized = WindowState == FormWindowState.Maximized;
@@ -740,7 +1009,6 @@ namespace HaRepacker.GUI
                 Program.ConfigurationManager.Save();
             }
         }
-        #endregion
 
         private void removeToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -762,7 +1030,7 @@ namespace HaRepacker.GUI
 
             string[] wzFilesToDump = (string[])((object[])param)[0];
             string baseDir = (string)((object[])param)[1];
-            WzMapleVersion version = (WzMapleVersion)((object[])param)[2];
+            WzMapleVersion version = GetWzMapleVersionByWzEncryptionBoxSelection( ((int[])param)[2]);
             IWzFileSerializer serializer = (IWzFileSerializer)((object[])param)[3];
             UpdateProgressBar(MainPanel.mainProgressBar, 0, false, true);
             UpdateProgressBar(MainPanel.mainProgressBar, wzFilesToDump.Length, true, true);
@@ -780,7 +1048,10 @@ namespace HaRepacker.GUI
                     continue;
                 }
                 WzFile f = new WzFile(wzpath, version);
-                f.ParseWzFile();
+
+                string parseErrorMessage = string.Empty;
+                bool parseSuccess = f.ParseWzFile(out parseErrorMessage);
+
                 serializer.SerializeFile(f, Path.Combine(baseDir, f.Name));
                 f.Dispose();
                 UpdateProgressBar(MainPanel.mainProgressBar, 1, false, false);
@@ -1138,6 +1409,176 @@ namespace HaRepacker.GUI
             new Thread(new ParameterizedThreadStart(ProgressBarThread)).Start(serializer);
         }
 
+        private void expandAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainPanel.DataTree.BeginUpdate();
+            MainPanel.DataTree.ExpandAll();
+            MainPanel.DataTree.EndUpdate();
+        }
+
+        private void collapseAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainPanel.DataTree.BeginUpdate();
+            MainPanel.DataTree.CollapseAll();
+            MainPanel.DataTree.EndUpdate();
+        }
+
+        private void xMLToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            if (MainPanel.DataTree.SelectedNode == null || (!(MainPanel.DataTree.SelectedNode.Tag is WzDirectory) && !(MainPanel.DataTree.SelectedNode.Tag is WzFile) && !(MainPanel.DataTree.SelectedNode.Tag is IPropertyContainer)))
+                return;
+            WzFile wzFile = ((WzObject)MainPanel.DataTree.SelectedNode.Tag).WzFileParent;
+            if (!(wzFile is WzFile))
+                return;
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Title = HaRepacker.Properties.Resources.SelectXml,
+                Filter = string.Format("{0}|*.xml", HaRepacker.Properties.Resources.XmlFilter),
+                Multiselect = true
+            };
+
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return;
+            WzXmlDeserializer deserializer = new WzXmlDeserializer(true, WzTool.GetIvByMapleVersion(wzFile.MapleVersion));
+            yesToAll = false;
+            noToAll = false;
+            threadDone = false;
+
+            runningThread = new Thread(new ParameterizedThreadStart(WzImporterThread));
+            runningThread.Start(new object[]
+            {
+                deserializer, dialog.FileNames, MainPanel.DataTree.SelectedNode, null
+            });
+            new Thread(new ParameterizedThreadStart(ProgressBarThread)).Start(deserializer);
+        }
+
+        private void iMGToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            if (MainPanel.DataTree.SelectedNode == null || (!(MainPanel.DataTree.SelectedNode.Tag is WzDirectory) && !(MainPanel.DataTree.SelectedNode.Tag is WzFile) && !(MainPanel.DataTree.SelectedNode.Tag is IPropertyContainer)))
+                return;
+
+            WzFile wzFile = ((WzObject)MainPanel.DataTree.SelectedNode.Tag).WzFileParent;
+            if (!(wzFile is WzFile))
+                return;
+
+            OpenFileDialog dialog = new OpenFileDialog()
+            {
+                Title = HaRepacker.Properties.Resources.SelectWzImg,
+                Filter = string.Format("{0}|*.img", HaRepacker.Properties.Resources.WzImgFilter),
+                Multiselect = true
+            };
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+
+            WzMapleVersion wzImageImportVersion = WzMapleVersion.BMS;
+            bool input = WzMapleVersionInputBox.Show(HaRepacker.Properties.Resources.InteractionWzMapleVersionTitle, out wzImageImportVersion);
+            if (!input)
+                return;
+
+            byte[] iv = WzTool.GetIvByMapleVersion(wzImageImportVersion);
+            WzImgDeserializer deserializer = new WzImgDeserializer(true);
+            yesToAll = false;
+            noToAll = false;
+            threadDone = false;
+
+            runningThread = new Thread(new ParameterizedThreadStart(WzImporterThread));
+            runningThread.Start(
+                new object[]
+                {
+                    deserializer, dialog.FileNames, MainPanel.DataTree.SelectedNode, iv
+                });
+            new Thread(new ParameterizedThreadStart(ProgressBarThread)).Start(deserializer);
+        }
+
+        private void searchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //MainPanel.findStrip.Visible = true;
+        }
+
+        private static readonly string helpFile = "help.html";
+        private void viewHelpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string helpPath = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.FullName, helpFile);
+            if (File.Exists(helpPath))
+                Help.ShowHelp(this, helpFile);
+            else
+                Warning.Error(string.Format(HaRepacker.Properties.Resources.MainHelpOpenFail, helpFile));
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainPanel.DoCopy();
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainPanel.DoPaste();
+        }
+
+        private void aPNGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MainPanel.DataTree.SelectedNode == null) return;
+            if (!ValidAnimation((WzObject)MainPanel.DataTree.SelectedNode.Tag))
+                Warning.Error(HaRepacker.Properties.Resources.MainAnimationFail);
+            else
+            {
+                SaveFileDialog dialog = new SaveFileDialog()
+                {
+                    Title = HaRepacker.Properties.Resources.SelectOutApng,
+                    Filter = string.Format("{0}|*.png", HaRepacker.Properties.Resources.ApngFilter)
+                };
+                if (dialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                AnimationBuilder.ExtractAnimation((WzSubProperty)MainPanel.DataTree.SelectedNode.Tag, dialog.FileName,
+                    Program.ConfigurationManager.UserSettings.UseApngIncompatibilityFrame);
+            }
+        }
+
+        /// <summary>
+        /// Wz string searcher tool
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItem_searchWzStrings_Click(object sender, EventArgs e)
+        {
+            // Map name load
+            string loadedWzVersion;
+            WzStringSearchFormDataCache dataCache = new WzStringSearchFormDataCache(GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex));
+            if (dataCache.OpenBaseWZFile(out loadedWzVersion))
+            {
+                WzStringSearchForm form = new WzStringSearchForm(dataCache, loadedWzVersion);
+                form.Show();
+            }
+        }
+
+        /// <summary>
+        /// Get packet encryption keys from ZLZ.dll
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void toolStripMenuItem_WzEncryption_Click(object sender, EventArgs e)
+        {
+            AssemblyName executingAssemblyName = Assembly.GetExecutingAssembly().GetName();
+            //similarly to find process architecture  
+            var assemblyArchitecture = executingAssemblyName.ProcessorArchitecture;
+
+            if (assemblyArchitecture == ProcessorArchitecture.X86)
+            {
+                ZLZPacketEncryptionKeyForm form = new ZLZPacketEncryptionKeyForm();
+                bool opened = form.OpenZLZDllFile();
+
+                if (opened)
+                    form.Show();
+            }
+            else
+            {
+                MessageBox.Show(HaRepacker.Properties.Resources.ExecutingAssemblyError, HaRepacker.Properties.Resources.Warning, MessageBoxButtons.OK);
+            }
+        }
+        #endregion 
+
         private void AbortButton_Click(object sender, EventArgs e)
         {
             if (Warning.Warn(HaRepacker.Properties.Resources.MainConfirmAbort))
@@ -1173,67 +1614,6 @@ namespace HaRepacker.GUI
                 if (i.ToString() != props[i].Name)
                     return false;
             return true;
-        }
-
-        private void aPNGToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (MainPanel.DataTree.SelectedNode == null) return;
-            if (!ValidAnimation((WzObject)MainPanel.DataTree.SelectedNode.Tag))
-                Warning.Error(HaRepacker.Properties.Resources.MainAnimationFail);
-            else
-            {
-                SaveFileDialog dialog = new SaveFileDialog() {
-                    Title = HaRepacker.Properties.Resources.SelectOutApng,
-                    Filter = string.Format("{0}|*.png", HaRepacker.Properties.Resources.ApngFilter)
-                };
-                if (dialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-                AnimationBuilder.ExtractAnimation((WzSubProperty)MainPanel.DataTree.SelectedNode.Tag, dialog.FileName,
-                    Program.ConfigurationManager.UserSettings.UseApngIncompatibilityFrame);
-            }
-        }
-
-        /// <summary>
-        /// Wz string searcher tool
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void toolStripMenuItem_searchWzStrings_Click(object sender, EventArgs e)
-        {
-            // Map name load
-            string loadedWzVersion;
-            WzStringSearchFormDataCache dataCache = new WzStringSearchFormDataCache((WzMapleVersion)encryptionBox.SelectedIndex);
-            if (dataCache.OpenBaseWZFile(out loadedWzVersion))
-            {
-                WzStringSearchForm form = new WzStringSearchForm(dataCache, loadedWzVersion);
-                form.Show();
-            }
-        }
-
-        /// <summary>
-        /// Get packet encryption keys from ZLZ.dll
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void toolStripMenuItem_WzEncryption_Click(object sender, EventArgs e)
-        {
-            AssemblyName executingAssemblyName = Assembly.GetExecutingAssembly().GetName();
-            //similarly to find process architecture  
-            var assemblyArchitecture = executingAssemblyName.ProcessorArchitecture;
-
-            if (assemblyArchitecture == ProcessorArchitecture.X86)
-            {
-                ZLZPacketEncryptionKeyForm form = new ZLZPacketEncryptionKeyForm();
-                bool opened = form.OpenZLZDllFile();
-
-                if (opened)
-                    form.Show();
-            } else
-            {
-                MessageBox.Show(HaRepacker.Properties.Resources.ExecutingAssemblyError, HaRepacker.Properties.Resources.Warning, MessageBoxButtons.OK);
-            }
         }
         #endregion
 
@@ -1389,48 +1769,6 @@ namespace HaRepacker.GUI
         }
         #endregion
 
-        private void expandAllToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MainPanel.DataTree.BeginUpdate();
-            MainPanel.DataTree.ExpandAll();
-            MainPanel.DataTree.EndUpdate();
-        }
-
-        private void collapseAllToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MainPanel.DataTree.BeginUpdate();
-            MainPanel.DataTree.CollapseAll();
-            MainPanel.DataTree.EndUpdate();
-        }
-
-        private void xMLToolStripMenuItem2_Click(object sender, EventArgs e)
-        {
-            if (MainPanel.DataTree.SelectedNode == null || (!(MainPanel.DataTree.SelectedNode.Tag is WzDirectory) && !(MainPanel.DataTree.SelectedNode.Tag is WzFile) && !(MainPanel.DataTree.SelectedNode.Tag is IPropertyContainer)))
-                return;
-            WzFile wzFile = ((WzObject)MainPanel.DataTree.SelectedNode.Tag).WzFileParent;
-            if (!(wzFile is WzFile))
-                return;
-            OpenFileDialog dialog = new OpenFileDialog()
-            {
-                Title = HaRepacker.Properties.Resources.SelectXml,
-                Filter = string.Format("{0}|*.xml", HaRepacker.Properties.Resources.XmlFilter),
-                Multiselect = true
-            };
-
-            if (dialog.ShowDialog() != DialogResult.OK)
-                return;
-            WzXmlDeserializer deserializer = new WzXmlDeserializer(true, WzTool.GetIvByMapleVersion(wzFile.MapleVersion));
-            yesToAll = false;
-            noToAll = false;
-            threadDone = false;
-
-            runningThread = new Thread(new ParameterizedThreadStart(WzImporterThread));
-            runningThread.Start(new object[]
-            {
-                deserializer, dialog.FileNames, MainPanel.DataTree.SelectedNode, null
-            });
-            new Thread(new ParameterizedThreadStart(ProgressBarThread)).Start(deserializer);
-        }
 
 
         private delegate void InsertWzNode(WzNode node, WzNode parent);
@@ -1546,69 +1884,6 @@ namespace HaRepacker.GUI
                 UpdateProgressBar(MainPanel.mainProgressBar, 1, false, false);
             }
             threadDone = true;
-        }
-
-        private void iMGToolStripMenuItem2_Click(object sender, EventArgs e)
-        {
-            if (MainPanel.DataTree.SelectedNode == null || (!(MainPanel.DataTree.SelectedNode.Tag is WzDirectory) && !(MainPanel.DataTree.SelectedNode.Tag is WzFile) && !(MainPanel.DataTree.SelectedNode.Tag is IPropertyContainer)))
-                return;
-
-            WzFile wzFile = ((WzObject)MainPanel.DataTree.SelectedNode.Tag).WzFileParent;
-            if (!(wzFile is WzFile))
-                return;
-
-            OpenFileDialog dialog = new OpenFileDialog()
-            {
-                Title = HaRepacker.Properties.Resources.SelectWzImg,
-                Filter = string.Format("{0}|*.img", HaRepacker.Properties.Resources.WzImgFilter),
-                Multiselect = true
-            };
-            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                return;
-
-            WzMapleVersion wzImageImportVersion = WzMapleVersion.BMS;
-            bool input = WzMapleVersionInputBox.Show(HaRepacker.Properties.Resources.InteractionWzMapleVersionTitle, out wzImageImportVersion);
-            if (!input)
-                return;
-
-            byte[] iv = WzTool.GetIvByMapleVersion(wzImageImportVersion);
-            WzImgDeserializer deserializer = new WzImgDeserializer(true);
-            yesToAll = false;
-            noToAll = false;
-            threadDone = false;
-
-            runningThread = new Thread(new ParameterizedThreadStart(WzImporterThread));
-            runningThread.Start(
-                new object[]
-                {
-                    deserializer, dialog.FileNames, MainPanel.DataTree.SelectedNode, iv
-                });
-            new Thread(new ParameterizedThreadStart(ProgressBarThread)).Start(deserializer);
-        }
-
-        private void searchToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //MainPanel.findStrip.Visible = true;
-        }
-
-        private static readonly string HelpFile = "help.html";
-        private void viewHelpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string helpPath = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.FullName, HelpFile);
-            if (File.Exists(helpPath))
-                Help.ShowHelp(this, helpPath);
-            else
-                Warning.Error(string.Format(HaRepacker.Properties.Resources.MainHelpOpenFail, HelpFile));
-        }
-
-        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MainPanel.DoCopy();
-        }
-
-        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MainPanel.DoPaste();
         }
     }
 }

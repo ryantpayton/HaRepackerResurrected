@@ -45,13 +45,21 @@ namespace HaRepacker
                 {
                     wzFiles.Add(f);
                 }
-                f.ParseWzFile();
+                string parseErrorMessage = string.Empty;
+                bool parseSuccess = f.ParseWzFile(out parseErrorMessage);
+                if (!parseSuccess)
+                {
+                    file = null;
+                    Warning.Error("Error initializing " + Path.GetFileName(path) + " (" + parseErrorMessage + ").");
+                    return false;
+                }
+
                 file = f;
                 return true;
             }
             catch (Exception e)
             {
-                Warning.Error("Error initializing " + Path.GetFileName(path) + " (" + e.Message + ").\r\nCheck that the directory is valid and the file is not in use.");
+                Warning.Error("Error initializing " + Path.GetFileName(path) + " (" + e.Message + ").\r\nAlso, check that the directory is valid and the file is not in use.");
                 file = null;
                 return false;
             }
@@ -104,17 +112,21 @@ namespace HaRepacker
         /// <returns></returns>
         public WzImage LoadDataWzHotfixFile(string path, WzMapleVersion encVersion, MainPanel panel)
         {
-            FileStream fs = File.Open(path, FileMode.Open);
+            WzImage img;
 
-            WzImage img = new WzImage(Path.GetFileName(path), fs, encVersion);
-            img.ParseImage(true);
-
-            WzNode node = new WzNode(img);
-            panel.DataTree.Nodes.Add(node);
-            if (Program.ConfigurationManager.UserSettings.Sort)
+            using (FileStream fs = File.Open(path, FileMode.Open))
             {
-                SortNodesRecursively(node);
+                img = new WzImage(Path.GetFileName(path), fs, encVersion);
+                img.ParseImage(true);
+
+                WzNode node = new WzNode(img);
+                panel.DataTree.Nodes.Add(node);
+                if (Program.ConfigurationManager.UserSettings.Sort)
+                {
+                    SortNodesRecursively(node);
+                }
             }
+
             return img;
 
         }
@@ -128,6 +140,7 @@ namespace HaRepacker
         {
             short fileVersion = -1;
             bool isList = WzTool.IsListFile(path);
+
             return LoadWzFile(path, WzTool.DetectMapleVersion(path, out fileVersion), fileVersion);
         }
 

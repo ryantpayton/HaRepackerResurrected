@@ -21,6 +21,8 @@ using System;
 using MapleLib.WzLib.Util;
 using MapleLib.WzLib.WzProperties;
 using System.Threading.Tasks;
+using MapleLib.PacketLib;
+using HaRepacker.Configuration;
 
 namespace MapleLib.WzLib
 {
@@ -90,14 +92,13 @@ namespace MapleLib.WzLib
 
         public override void Dispose()
         {
-            if (wzDir.reader == null) return;
+            if (wzDir == null || wzDir.reader == null)
+                return;
             wzDir.reader.Close();
             Header = null;
             path = null;
             name = null;
             WzDirectory.Dispose();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
 
         /// <summary>
@@ -119,19 +120,8 @@ namespace MapleLib.WzLib
         /// Open a wz file from a file on the disk
         /// </summary>
         /// <param name="filePath">Path to the wz file</param>
-        public WzFile(string filePath, WzMapleVersion version)
+        public WzFile(string filePath, WzMapleVersion version) : this(filePath, -1, version)
         {
-            name = Path.GetFileName(filePath);
-            path = filePath;
-            mapleStoryPatchVersion = -1;
-            maplepLocalVersion = version;
-            if (version == WzMapleVersion.GETFROMZLZ)
-            {
-                FileStream zlzStream = File.OpenRead(Path.Combine(Path.GetDirectoryName(filePath), "ZLZ.dll"));
-                WzIv = Util.WzKeyGenerator.GetIvFromZlz(zlzStream);
-                zlzStream.Close();
-            }
-            else WzIv = WzTool.GetIvByMapleVersion(version);
         }
 
         /// <summary>
@@ -144,45 +134,76 @@ namespace MapleLib.WzLib
             path = filePath;
             mapleStoryPatchVersion = gameVersion;
             maplepLocalVersion = version;
+
             if (version == WzMapleVersion.GETFROMZLZ)
             {
                 FileStream zlzStream = File.OpenRead(Path.Combine(Path.GetDirectoryName(filePath), "ZLZ.dll"));
-                WzIv = Util.WzKeyGenerator.GetIvFromZlz(zlzStream);
+                this.WzIv = Util.WzKeyGenerator.GetIvFromZlz(zlzStream);
                 zlzStream.Close();
             }
-            else WzIv = WzTool.GetIvByMapleVersion(version);
+            else
+                this.WzIv = WzTool.GetIvByMapleVersion(version);
+        }
+
+        /// <summary>
+        /// Open a wz file from a file on the disk with a custom WzIv key
+        /// </summary>
+        /// <param name="filePath">Path to the wz file</param>
+        public WzFile(string filePath, byte[] wzIv)
+        {
+            name = Path.GetFileName(filePath);
+            path = filePath;
+            mapleStoryPatchVersion = -1;
+            maplepLocalVersion = WzMapleVersion.CUSTOM;
+
+            this.WzIv = wzIv;
         }
 
         /// <summary>
         /// Parses the wz file, if the wz file is a list.wz file, WzDirectory will be a WzListDirectory, if not, it'll simply be a WzDirectory
         /// </summary>
-        public void ParseWzFile()
+        /// <param name="WzIv">WzIv is not set if null (Use existing iv)</param>
+        public bool ParseWzFile(out string parseErrorMessage, byte[] WzIv = null)
         {
-            if (maplepLocalVersion == WzMapleVersion.GENERATE)
-                throw new InvalidOperationException("Cannot call ParseWzFile() if WZ file type is GENERATE");
-            ParseMainWzDirectory();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            /*if (maplepLocalVersion != WzMapleVersion.GENERATE)
+            {
+                parseErrorMessage = ("Cannot call ParseWzFile() if WZ file type is not GENERATE. Have you entered an invalid WZ key? ");
+                return false;
+            }*/
+            if (WzIv != null)
+            {
+                this.WzIv = WzIv;
+            }
+            bool parseSuccess = ParseMainWzDirectory(out parseErrorMessage, false);
+
+            return parseSuccess;
         }
 
-        public void ParseWzFile(byte[] WzIv)
+        /// <summary>
+        /// Lazly parses the wz file, for faster bruteforcing
+        /// </summary>
+        /// <param name="parseErrorMessage"></param>
+        /// <returns></returns>
+        public bool LazyParseWzFile(out string parseErrorMessage)
         {
-            if (maplepLocalVersion != WzMapleVersion.GENERATE)
-                throw new InvalidOperationException(
-                    "Cannot call ParseWzFile(byte[] generateKey) if WZ file type is not GENERATE");
-            this.WzIv = WzIv;
-            ParseMainWzDirectory();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            bool parseSuccess = ParseMainWzDirectory(out parseErrorMessage, true);
+            return parseSuccess;
         }
 
 
-        internal void ParseMainWzDirectory()
+        /// <summary>
+        /// Parse directories in the WZ file
+        /// </summary>
+        /// <param name="parseErrorMessage"></param>
+        /// <param name="lazyParse">Only load the firt WzDirectory found if true</param>
+        /// <returns></returns>
+        internal bool ParseMainWzDirectory(out string parseErrorMessage, bool lazyParse = false)
         {
             if (this.path == null)
             {
                 Helpers.ErrorLogger.Log(Helpers.ErrorLevel.Critical, "[Error] Path is null");
-                return;
+                parseErrorMessage = "[Error] Path is null";
+                return false;
             }
             WzBinaryReader reader = new WzBinaryReader(File.Open(this.path, FileMode.Open, FileAccess.Read, FileShare.Read), WzIv);
 
@@ -201,22 +222,28 @@ namespace MapleLib.WzLib
                 {
                     this.mapleStoryPatchVersion = (short)j;
                     this.versionHash = GetVersionHash(version, mapleStoryPatchVersion);
-                    if (this.versionHash != 0)
+                    if (this.versionHash == 0)
                     {
-                        reader.Hash = this.versionHash;
-                        long position = reader.BaseStream.Position;
-                        WzDirectory testDirectory = null;
-                        try
-                        {
-                            testDirectory = new WzDirectory(reader, this.name, this.versionHash, this.WzIv, this);
-                            testDirectory.ParseDirectory();
-                        }
-                        catch
-                        {
-                            reader.BaseStream.Position = position;
-                            continue;
-                        }
-                        WzImage testImage = testDirectory.GetChildImages()[0];
+                        continue;
+                    }
+                    reader.Hash = this.versionHash;
+                    long position = reader.BaseStream.Position; // save position to rollback to 
+                    WzDirectory testDirectory = null;
+                    try
+                    {
+                        testDirectory = new WzDirectory(reader, this.name, this.versionHash, this.WzIv, this);
+                        testDirectory.ParseDirectory(lazyParse);
+                    }
+                    catch
+                    {
+                        reader.BaseStream.Position = position;
+                        continue;
+                    }
+
+                    List<WzImage> childImages = testDirectory.GetChildImages();
+                    if (childImages.Count > 0) // coincidentally in msea v194 Map001.wz, the hash matches exactly, and it fails to decrypt later on (probably 1 in a million chance). mapleStoryPatchVersion used = 113
+                    {
+                        WzImage testImage = childImages[0];
 
                         try
                         {
@@ -230,20 +257,26 @@ namespace MapleLib.WzLib
                                 case 0x1b:
                                     {
                                         WzDirectory directory = new WzDirectory(reader, this.name, this.versionHash, this.WzIv, this);
-                                        directory.ParseDirectory();
+                                        directory.ParseDirectory(lazyParse);
                                         this.wzDir = directory;
-                                        return;
+
+                                        parseErrorMessage = "Success";
+                                        return true;
                                     }
                             }
-                            reader.BaseStream.Position = position;
+                            reader.BaseStream.Position = position; // reset
                         }
                         catch
                         {
-                            reader.BaseStream.Position = position;
+                            reader.BaseStream.Position = position; // reset
                         }
+                    } else
+                    {
+                        reader.BaseStream.Position = position; // reset
+                        continue; 
                     }
                 }
-                throw new Exception("Error with game version hash : The specified game version is incorrect and WzLib was unable to determine the version itself");
+                parseErrorMessage = "Error with game version hash : The specified game version is incorrect and WzLib was unable to determine the version itself";
             }
             else
             {
@@ -253,6 +286,9 @@ namespace MapleLib.WzLib
                 directory.ParseDirectory();
                 this.wzDir = directory;
             }
+
+            parseErrorMessage = "Success";
+            return true;
         }
 
         private static uint GetVersionHash(int encver, int realver)

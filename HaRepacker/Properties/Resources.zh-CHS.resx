@@ -139,7 +139,7 @@
     <value>Global MapleStory (旧)</value>
   </data>
   <data name="EncTypeMSEA" xml:space="preserve">
-    <value>新楓之谷/冒险岛Online/메이플스토리/MapleSEA(旧)</value>
+    <value>新楓之谷 / 冒险岛Online / 메이플스토리 / MapleSEA(旧)</value>
   </data>
   <data name="EncTypeNone" xml:space="preserve">
     <value>BMS / GMS / MapleSEA / メイプルストーリー / 메이플스토리</value>
@@ -380,5 +380,11 @@
   </data>
   <data name="ExecutingAssemblyError" xml:space="preserve">
     <value>This is only available under the x86 version of HaRepacker, please get the alternative version.</value>
+  </data>
+  <data name="EncTypeCustom" xml:space="preserve">
+    <value>使用自定义编码</value>
+  </data>
+  <data name="EncTypeGenerate" xml:space="preserve">
+    <value>Bruteforce AES密钥（生成）</value>
   </data>
 </root>

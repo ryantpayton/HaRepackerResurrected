@@ -205,6 +205,24 @@ namespace HaRepacker.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use custom encryption key.
+        /// </summary>
+        public static string EncTypeCustom {
+            get {
+                return ResourceManager.GetString("EncTypeCustom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bruteforce AES key (Generate).
+        /// </summary>
+        public static string EncTypeGenerate {
+            get {
+                return ResourceManager.GetString("EncTypeGenerate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to GMS (old).
         /// </summary>
         public static string EncTypeGMS {
@@ -214,7 +232,7 @@ namespace HaRepacker.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MSEA/Taiwan (old).
+        ///   Looks up a localized string similar to MSEA /Taiwan (old).
         /// </summary>
         public static string EncTypeMSEA {
             get {
@@ -223,7 +241,7 @@ namespace HaRepacker.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BMS/GMS/MapleSEA/メイプルストーリー/메이플스토리.
+        ///   Looks up a localized string similar to BMS / GMS / MapleSEA / メイプルストーリー / 메이플스토리.
         /// </summary>
         public static string EncTypeNone {
             get {

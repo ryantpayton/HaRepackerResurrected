@@ -16,8 +16,11 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.IO;
+using HaRepacker.Configuration;
 using MapleLib.MapleCryptoLib;
+using MapleLib.PacketLib;
 
 namespace MapleLib.WzLib.Util
 {
@@ -97,6 +100,11 @@ namespace MapleLib.WzLib.Util
             }
         }
 
+        /// <summary>
+        /// Get WZ encryption IV from maple version 
+        /// </summary>
+        /// <param name="ver"></param>
+        /// <returns></returns>
         public static byte[] GetIvByMapleVersion(WzMapleVersion ver)
         {
             switch (ver)
@@ -105,6 +113,25 @@ namespace MapleLib.WzLib.Util
                     return CryptoConstants.WZ_MSEAIV;//?
                 case WzMapleVersion.GMS:
                     return CryptoConstants.WZ_GMSIV;
+                case WzMapleVersion.CUSTOM: // custom WZ encryption bytes from stored app setting
+                    {
+                        ConfigurationManager config = new ConfigurationManager();
+                        bool loaded = config.Load();
+                        if (loaded)
+                        {
+                            string storedCustomEnc = config.ApplicationSettings.MapleVersion_EncryptionBytes;
+                            byte[] bytes = HexEncoding.GetBytes(storedCustomEnc);
+
+                            if (bytes.Length == 4)
+                            {
+                                return bytes;
+                            }
+                        }
+                        return new byte[4]; // fallback with BMS
+                    }
+                case WzMapleVersion.GENERATE: // dont fill anything with GENERATE, it is not supposed to load anything
+                    return new byte[4]; 
+
                 case WzMapleVersion.BMS:
                 case WzMapleVersion.CLASSIC:
                 default:
@@ -121,6 +148,35 @@ namespace MapleLib.WzLib.Util
             return result;
         }
 
+        
+        /// <summary>
+        /// Attempts to bruteforce the WzKey with a given WZ file
+        /// </summary>
+        /// <param name="wzPath"></param>
+        /// <param name="wzIvKey"></param>
+        /// <returns>The probability. Normalized to 100</returns>
+        public static bool TryBruteforcingWzIVKey(string wzPath, byte[] wzIvKey)
+        {
+            using (WzFile wzf = new WzFile(wzPath, wzIvKey))
+            {
+                string parseErrorMessage = string.Empty;
+                bool parsedSuccessfully = wzf.LazyParseWzFile(out parseErrorMessage);
+                if (!parsedSuccessfully)
+                {
+                    wzf.Dispose();
+                    return false;
+                }
+                if (wzf.WzDirectory.WzImages.Count > 0 && wzf.WzDirectory.WzImages[0].Name.EndsWith(".img"))
+                {
+                    wzf.Dispose();
+                    return true;
+                }
+
+                wzf.Dispose();
+            }
+            return false;
+        }
+
         private static double GetDecryptionSuccessRate(string wzPath, WzMapleVersion encVersion, ref short? version)
         {
             WzFile wzf;
@@ -128,7 +184,10 @@ namespace MapleLib.WzLib.Util
                 wzf = new WzFile(wzPath, encVersion);
             else
                 wzf = new WzFile(wzPath, (short)version, encVersion);
-            wzf.ParseWzFile();
+
+            string parseErrorMessage = string.Empty;
+            bool parsedSuccessfully = wzf.ParseWzFile(out parseErrorMessage);
+
             if (version == null) version = wzf.Version;
             int recognizedChars = 0;
             int totalChars = 0;
@@ -156,12 +215,15 @@ namespace MapleLib.WzLib.Util
             fileVersion = (short)version;
             WzMapleVersion mostSuitableVersion = WzMapleVersion.GMS;
             double maxSuccessRate = 0;
+
             foreach (DictionaryEntry mapleVersionEntry in mapleVersionSuccessRates)
+            {
                 if ((double)mapleVersionEntry.Value > maxSuccessRate)
                 {
                     mostSuitableVersion = (WzMapleVersion)mapleVersionEntry.Key;
                     maxSuccessRate = (double)mapleVersionEntry.Value;
                 }
+            }
             if (maxSuccessRate < 0.7 && File.Exists(Path.Combine(Path.GetDirectoryName(wzFilePath), "ZLZ.dll")))
                 return WzMapleVersion.GETFROMZLZ;
             else return mostSuitableVersion;

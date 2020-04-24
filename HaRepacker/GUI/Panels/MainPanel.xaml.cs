@@ -546,8 +546,9 @@ namespace HaRepacker.GUI.Panels
         #region Panel Loading Events
         /// <summary>
         /// Set panel loading splash screen from MainForm.cs
+        /// <paramref name="currentDispatcher"/>
         /// </summary>
-        public void OnSetPanelLoading()
+        public void OnSetPanelLoading(Dispatcher currentDispatcher = null)
         {
             Action action = () =>
             {
@@ -555,13 +556,17 @@ namespace HaRepacker.GUI.Panels
                 grid_LoadingPanel.Visibility = Visibility.Visible;
                 treeView_WinFormsHost.Visibility = Visibility.Collapsed;
             };
-            grid_LoadingPanel.Dispatcher.BeginInvoke(action);
+            if (currentDispatcher != null)
+                currentDispatcher.BeginInvoke(action);
+            else
+                grid_LoadingPanel.Dispatcher.BeginInvoke(action);
         }
 
         /// <summary>
         /// Remove panel loading splash screen from MainForm.cs
+        /// <paramref name="currentDispatcher"/>
         /// </summary>
-        public void OnSetPanelLoadingCompleted()
+        public void OnSetPanelLoadingCompleted(Dispatcher currentDispatcher = null)
         {
             Action action = () =>
             {
@@ -569,7 +574,10 @@ namespace HaRepacker.GUI.Panels
                 grid_LoadingPanel.Visibility = Visibility.Collapsed;
                 treeView_WinFormsHost.Visibility = Visibility.Visible;
             };
-            grid_LoadingPanel.Dispatcher.BeginInvoke(action);
+            if (currentDispatcher != null)
+                currentDispatcher.BeginInvoke(action);
+            else
+                grid_LoadingPanel.Dispatcher.BeginInvoke(action);
         }
         #endregion
 
@@ -719,7 +727,7 @@ namespace HaRepacker.GUI.Panels
 
             // Set tooltip text
             if (i_animateCanvasNode == animate_PreLoadImages.Count)
-                statusBarItemLabel_Others.Text = "# " + currentSelectedFrame.Name + ", Delay: " + currentSelectedFrame.Delay + " ms. Repeating Animate.";
+                statusBarItemLabel_Others.Text = "# " + currentSelectedFrame.Name + ", Delay: " + currentSelectedFrame.Delay + " ms. Repeating animation.";
             else
                 statusBarItemLabel_Others.Text = "# " + currentSelectedFrame.Name + ", Delay: " + currentSelectedFrame.Delay + " ms.";
 
@@ -1436,7 +1444,8 @@ namespace HaRepacker.GUI.Panels
                 canvasPropBox.CanvasVectorHead = headVector;
                 canvasPropBox.CanvasVectorLt = ltVector;
             }
-            canvasPropBox.Visibility = Visibility.Visible;
+            if (canvasPropBox.Visibility != Visibility.Visible)
+                canvasPropBox.Visibility = Visibility.Visible;
         }
         #endregion
 
