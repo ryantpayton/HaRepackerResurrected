@@ -126,7 +126,7 @@ namespace HaRepacker.GUI
         #region Theme colors
         public void SetThemeColor()
         {
-            if (Program.ConfigurationManager.UserSettings.ThemeColor == (int) UserSettingsThemeColor.Dark)//black
+            if (Program.ConfigurationManager.UserSettings.ThemeColor == (int)UserSettingsThemeColor.Dark)//black
             {
                 this.BackColor = Color.Black;
                 mainMenu.BackColor = Color.Black;
@@ -278,7 +278,7 @@ namespace HaRepacker.GUI
                 case WzMapleVersion.GENERATE:
                     if (fromNewForm) // dont return GENERATE, as that option is unavailable when creating a new WZ via NewForm.
                         setIndex = 2; // BMS
-                    else 
+                    else
                         setIndex = 4;
                     break;
             }
@@ -304,7 +304,7 @@ namespace HaRepacker.GUI
                 if (detectMapleVersion)
                     loadedWzFile = Program.WzMan.LoadWzFile(path);
                 else
-                    loadedWzFile = Program.WzMan.LoadWzFile(path, (WzMapleVersion) GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex));
+                    loadedWzFile = Program.WzMan.LoadWzFile(path, (WzMapleVersion)GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex));
 
                 if (loadedWzFile != null)
                     Program.WzMan.AddLoadedWzFileToMainPanel(loadedWzFile, panel);
@@ -569,7 +569,8 @@ namespace HaRepacker.GUI
                     return;
                 }
                 defaultName = tabName;
-            } else
+            }
+            else
             {
                 MainPanel = (MainPanel)elemHost.Child;
             }
@@ -709,7 +710,7 @@ namespace HaRepacker.GUI
                 {
                     fixed (byte* pbytes = &bytes[0])
                     {
-                        *(int*)pbytes = (int) i;
+                        *(int*)pbytes = (int)i;
                     }
                 }
                 bool tryDecrypt = WzTool.TryBruteforcingWzIVKey(dialog.FileName, bytes);
@@ -748,28 +749,41 @@ namespace HaRepacker.GUI
         private async void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Dispatcher currentDispatcher = Dispatcher.CurrentDispatcher;
-
             WzMapleVersion MapleVersionEncryptionSelected = GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex);
+
             if (MapleVersionEncryptionSelected == WzMapleVersion.GENERATE)
             {
-                StartWzKeyBruteforcing(currentDispatcher); // find needles in a haystack
+                StartWzKeyBruteforcing(currentDispatcher); // Find needles in a haystack
                 return;
             }
 
             // Load WZ file
             using (OpenFileDialog dialog = new OpenFileDialog()
             {
-                Title = HaRepacker.Properties.Resources.SelectWz,
-                Filter = string.Format("{0}|*.wz",
-                HaRepacker.Properties.Resources.WzFilter),
-                Multiselect = true,
+                Title = Properties.Resources.SelectWz,
+                Filter = string.Format("{0}|*.wz", Properties.Resources.WzFilter),
+                Multiselect = true
             })
             {
-
                 if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
-                List<string> wzfilePathsToLoad = new List<string>();
+                List<string> wzFilePathsToLoad = new List<string>();
+
+                // Ugly hack to only use files from Nexon. Someone could be saving a custom file name in their folder, e.g., Map_bak.wz.
+                List<string> otherWzFileNames = new List<string>()
+                {
+                    "Map001.wz",
+                    "Map002.wz",
+                    "Map2.wz",
+                    "Mob001.wz",
+                    "Mob2.wz",
+                    "Skill001.wz",
+                    "Skill002.wz",
+                    "Sound001.wz",
+                    "Sound2.wz"
+                };
+
                 foreach (string filePath in dialog.FileNames)
                 {
                     string filePathLowerCase = filePath.ToLower();
@@ -777,6 +791,7 @@ namespace HaRepacker.GUI
                     if (filePathLowerCase.EndsWith("data.wz") && WzTool.IsDataWzHotfixFile(filePath))
                     {
                         WzImage img = Program.WzMan.LoadDataWzHotfixFile(filePath, MapleVersionEncryptionSelected, MainPanel);
+
                         if (img == null)
                         {
                             MessageBox.Show(HaRepacker.Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
@@ -789,43 +804,43 @@ namespace HaRepacker.GUI
                     }
                     else
                     {
-                        wzfilePathsToLoad.Add(filePath); // add to list, so we can load it concurrently
+                        wzFilePathsToLoad.Add(filePath); // Add to list, so we can load it concurrently.
 
                         if (filePathLowerCase.EndsWith("map.wz"))
                         {
-                            string[] otherMapWzFiles = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Map*.wz");
-                            foreach (string filePath_Others in otherMapWzFiles)
-                            {
-                                if (filePath_Others != filePath &&
-                                    (filePath_Others.EndsWith("Map001.wz") || filePath_Others.EndsWith("Map2.wz"))) // damn, ugly hack to only whitelist those that Nexon uses. but someone could be saving as say Map_bak.wz in their folder.
-                                {
-                                    wzfilePathsToLoad.Add(filePath_Others);
-                                }
-                            }
+                            // Pre-load the other part of Map.wz
+                            string[] otherMapFileNames = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Map*.wz");
+
+                            foreach (string otherMapFileName in otherMapFileNames)
+                                if (otherWzFileNames.Contains(otherMapFileName.Substring(otherMapFileName.LastIndexOf("\\") + 1)))
+                                    wzFilePathsToLoad.Add(otherMapFileName);
                         }
-                        else if (filePathLowerCase.EndsWith("mob.wz"))  // Now pre-load the other part of Mob.wz
+                        else if (filePathLowerCase.EndsWith("mob.wz"))
                         {
-                            string[] otherMobWzFiles = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Mob*.wz");
-                            foreach (string filePath_Others in otherMobWzFiles)
-                            {
-                                if (filePath_Others != filePath &&
-                                    (filePath_Others.EndsWith("Mob001.wz") || filePath_Others.EndsWith("Mob2.wz")))
-                                {
-                                    wzfilePathsToLoad.Add(filePath_Others);
-                                }
-                            }
+                            // Pre-load the other part of Mob.wz
+                            string[] otherMobFileNames = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Mob*.wz");
+
+                            foreach (string otherMobFileName in otherMobFileNames)
+                                if (otherWzFileNames.Contains(otherMobFileName.Substring(otherMobFileName.LastIndexOf("\\") + 1)))
+                                    wzFilePathsToLoad.Add(otherMobFileName);
                         }
-                        else if (filePathLowerCase.EndsWith("skill.wz"))  // Now pre-load the other part of Skill.wz
+                        else if (filePathLowerCase.EndsWith("skill.wz"))
                         {
-                            string[] otherSkillWzFiles = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Skill*.wz");
-                            foreach (string filePath_Others in otherSkillWzFiles)
-                            {
-                                if (filePath_Others != filePath &&
-                                    filePath_Others.EndsWith("Skill001.wz"))
-                                {
-                                    wzfilePathsToLoad.Add(filePath_Others);
-                                }
-                            }
+                            // Pre-load the other part of Skill.wz
+                            string[] otherSkillFileNames = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Skill*.wz");
+
+                            foreach (string otherSkillFileName in otherSkillFileNames)
+                                if (otherWzFileNames.Contains(otherSkillFileName.Substring(otherSkillFileName.LastIndexOf("\\") + 1)))
+                                    wzFilePathsToLoad.Add(otherSkillFileName);
+                        }
+                        else if (filePathLowerCase.EndsWith("sound.wz"))
+                        {
+                            // Pre-load the other part of Sound.wz
+                            string[] otherSoundFileNames = Directory.GetFiles(filePath.Substring(0, filePath.LastIndexOf("\\")), "Sound*.wz");
+
+                            foreach (string otherSoundFileName in otherSoundFileNames)
+                                if (otherWzFileNames.Contains(otherSoundFileName.Substring(otherSoundFileName.LastIndexOf("\\") + 1)))
+                                    wzFilePathsToLoad.Add(otherSoundFileName);
                         }
                     }
                 }
@@ -833,39 +848,39 @@ namespace HaRepacker.GUI
                 // Show splash screen
                 MainPanel.OnSetPanelLoading();
 
-                // Try opening one, to see if the user is having the right priviledge
+                // Try opening one, and check if the user has the right privileges.
 
-                // Load all original WZ files 
+                // Load all original WZ files
                 await Task.Run(() =>
                 {
                     List<WzFile> loadedWzFiles = new List<WzFile>();
-                    ParallelLoopResult loop = Parallel.ForEach(wzfilePathsToLoad, filePath =>
+
+                    ParallelLoopResult loop = Parallel.ForEach(wzFilePathsToLoad, filePath =>
                     {
                         WzFile f = Program.WzMan.LoadWzFile(filePath, MapleVersionEncryptionSelected);
+
                         if (f == null)
                         {
-                            // error should be thrown 
+                            // Error should be thrown 
                         }
                         else
                         {
                             lock (loadedWzFiles)
-                            {
                                 loadedWzFiles.Add(f);
-                            }
                         }
                     });
+
                     while (!loop.IsCompleted)
-                    {
                         Thread.Sleep(500);
-                    }
 
-                    foreach (WzFile wzFile in loadedWzFiles) // add later, once everything is loaded to memory
-                    {
+                    // Add later, once everything is loaded into memory.
+                    foreach (WzFile wzFile in loadedWzFiles)
                         Program.WzMan.AddLoadedWzFileToMainPanel(wzFile, MainPanel, currentDispatcher);
-                    }
-                }); // load complete
+                });
 
-                // Hide panel splash sdcreen
+                // Load complete
+
+                // Hide panel splash screen
                 MainPanel.OnSetPanelLoadingCompleted();
             }
         }
@@ -1030,7 +1045,7 @@ namespace HaRepacker.GUI
 
             string[] wzFilesToDump = (string[])((object[])param)[0];
             string baseDir = (string)((object[])param)[1];
-            WzMapleVersion version = GetWzMapleVersionByWzEncryptionBoxSelection( ((int[])param)[2]);
+            WzMapleVersion version = GetWzMapleVersionByWzEncryptionBoxSelection(((int[])param)[2]);
             IWzFileSerializer serializer = (IWzFileSerializer)((object[])param)[3];
             UpdateProgressBar(MainPanel.mainProgressBar, 0, false, true);
             UpdateProgressBar(MainPanel.mainProgressBar, wzFilesToDump.Length, true, true);
@@ -1500,7 +1515,7 @@ namespace HaRepacker.GUI
         {
             string helpPath = Path.Combine(new DirectoryInfo(Environment.CurrentDirectory).Parent.Parent.FullName, helpFile);
             if (File.Exists(helpPath))
-                Help.ShowHelp(this, helpFile);
+                Help.ShowHelp(this, helpPath);
             else
                 Warning.Error(string.Format(HaRepacker.Properties.Resources.MainHelpOpenFail, helpFile));
         }

@@ -75,7 +75,7 @@ namespace HaRepacker
         {
             this.parentPanel = haRepackerMainPanel;
 
-            SaveFile = new ToolStripMenuItem("Save", Properties.Resources.disk, new EventHandler(
+            SaveFile = new ToolStripMenuItem("Save", Properties.Resources.save_s, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     foreach (WzNode node in GetNodes(sender))
@@ -83,18 +83,18 @@ namespace HaRepacker
                         new SaveForm(parentPanel, node).ShowDialog();
                     }
                 }));
-            Rename = new ToolStripMenuItem("Rename", Properties.Resources.rename, new EventHandler(
+            Rename = new ToolStripMenuItem("Rename", Properties.Resources.pencil_alt_s, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     haRepackerMainPanel.PromptRenameSelectedTreeNode();
                 }));
-            Remove = new ToolStripMenuItem("Remove", Properties.Resources.delete, new EventHandler(
+            Remove = new ToolStripMenuItem("Remove", Properties.Resources.trash_alt_s, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     haRepackerMainPanel.PromptRemoveSelectedTreeNodes();
                 }));
 
-            Unload = new ToolStripMenuItem("Unload", Properties.Resources.delete, new EventHandler(
+            Unload = new ToolStripMenuItem("Unload", Properties.Resources.trash_alt_s, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     if (!Warning.Warn("Are you sure you want to unload this file?"))
@@ -105,7 +105,7 @@ namespace HaRepacker
                         Program.WzMan.UnloadWzFile((WzFile)node.Tag);
                     }
                 }));
-            Reload = new ToolStripMenuItem("Reload", Properties.Resources.arrow_refresh, new EventHandler(
+            Reload = new ToolStripMenuItem("Reload", Properties.Resources.sync_alt_s, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     if (!Warning.Warn("Are you sure you want to reload this file?"))
@@ -116,7 +116,7 @@ namespace HaRepacker
                         Program.WzMan.ReloadWzFile((WzFile)node.Tag, parentPanel);
                     }
                 }));
-            CollapseAllChildNode = new ToolStripMenuItem("Collapse All", Properties.Resources.collapse, new EventHandler(
+            CollapseAllChildNode = new ToolStripMenuItem("Collapse All", Properties.Resources.minus_square_r, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     foreach (WzNode node in GetNodes(sender))
@@ -124,7 +124,7 @@ namespace HaRepacker
                         node.Collapse();
                     }
                 }));
-            ExpandAllChildNode = new ToolStripMenuItem("Expand all", Properties.Resources.expand, new EventHandler(
+            ExpandAllChildNode = new ToolStripMenuItem("Expand all", Properties.Resources.plus_square_r, new EventHandler(
                 delegate (object sender, EventArgs e)
                 {
                     foreach (WzNode node in GetNodes(sender))
@@ -314,9 +314,9 @@ namespace HaRepacker
                     haRepackerMainPanel.AddWzVectorPropertyToSelectedIndex(nodes[0]);
                 }));
 
-            AddConvexSubMenu = new ToolStripMenuItem("Add", Properties.Resources.add, AddVector);
-            AddDirsSubMenu = new ToolStripMenuItem("Add", Properties.Resources.add, AddDirectory, AddImage);
-            AddPropsSubMenu = new ToolStripMenuItem("Add", Properties.Resources.add, AddCanvas, AddConvex, AddDouble, AddByteFloat, AddLong, AddInt, AddNull, AddUshort, AddSound, AddString, AddSub, AddUOL, AddVector);
+            AddConvexSubMenu = new ToolStripMenuItem("Add", Properties.Resources.plus_s, AddVector);
+            AddDirsSubMenu = new ToolStripMenuItem("Add", Properties.Resources.plus_s, AddDirectory, AddImage);
+            AddPropsSubMenu = new ToolStripMenuItem("Add", Properties.Resources.plus_s, AddCanvas, AddConvex, AddDouble, AddByteFloat, AddLong, AddInt, AddNull, AddUshort, AddSound, AddString, AddSub, AddUOL, AddVector);
 
             WzFileMenu = new ContextMenuStrip();
             WzFileMenu.Items.AddRange(new ToolStripItem[] { AddDirsSubMenu, SaveFile, Unload, Reload });

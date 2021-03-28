@@ -126,34 +126,37 @@ namespace HaRepacker.GUI
             // 
             // newToolStripMenuItem
             // 
-            this.newToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.page_white;
+            this.newToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.file_plus_r;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             resources.ApplyResources(this.newToolStripMenuItem, "newToolStripMenuItem");
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
-            this.openToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.folder;
+            this.openToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.folder_open_r;
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             resources.ApplyResources(this.openToolStripMenuItem, "openToolStripMenuItem");
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
-            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
+            this.saveToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.save_r;
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // unloadAllToolStripMenuItem
             // 
-            resources.ApplyResources(this.unloadAllToolStripMenuItem, "unloadAllToolStripMenuItem");
+            this.unloadAllToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.minus_circle_r;
             this.unloadAllToolStripMenuItem.Name = "unloadAllToolStripMenuItem";
+            resources.ApplyResources(this.unloadAllToolStripMenuItem, "unloadAllToolStripMenuItem");
             this.unloadAllToolStripMenuItem.Click += new System.EventHandler(this.unloadAllToolStripMenuItem_Click);
             // 
             // reloadAllToolStripMenuItem
             // 
-            resources.ApplyResources(this.reloadAllToolStripMenuItem, "reloadAllToolStripMenuItem");
+            this.reloadAllToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.sync_alt_r;
             this.reloadAllToolStripMenuItem.Name = "reloadAllToolStripMenuItem";
+            resources.ApplyResources(this.reloadAllToolStripMenuItem, "reloadAllToolStripMenuItem");
             this.reloadAllToolStripMenuItem.Click += new System.EventHandler(this.reloadAllToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem
@@ -187,8 +190,9 @@ namespace HaRepacker.GUI
             this.wzUnsignedShortPropertyToolStripMenuItem,
             this.wzUolPropertyToolStripMenuItem,
             this.wzVectorPropertyToolStripMenuItem});
-            resources.ApplyResources(this.addToolStripMenuItem, "addToolStripMenuItem");
+            this.addToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.plus_circle_r;
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            resources.ApplyResources(this.addToolStripMenuItem, "addToolStripMenuItem");
             // 
             // wzDirectoryToolStripMenuItem
             // 
@@ -287,8 +291,9 @@ namespace HaRepacker.GUI
             // 
             // removeToolStripMenuItem
             // 
-            resources.ApplyResources(this.removeToolStripMenuItem, "removeToolStripMenuItem");
+            this.removeToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.minus_circle_r;
             this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            resources.ApplyResources(this.removeToolStripMenuItem, "removeToolStripMenuItem");
             this.removeToolStripMenuItem.Click += new System.EventHandler(this.removeToolStripMenuItem_Click);
             // 
             // undoToolStripMenuItem
@@ -332,7 +337,7 @@ namespace HaRepacker.GUI
             this.xMLToolStripMenuItem,
             this.rawDataToolStripMenuItem,
             this.imgToolStripMenuItem});
-            this.exportFilesToXMLToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.folder_go;
+            this.exportFilesToXMLToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.file_export_r;
             this.exportFilesToXMLToolStripMenuItem.Name = "exportFilesToXMLToolStripMenuItem";
             resources.ApplyResources(this.exportFilesToXMLToolStripMenuItem, "exportFilesToXMLToolStripMenuItem");
             // 
@@ -360,7 +365,7 @@ namespace HaRepacker.GUI
             this.xMLToolStripMenuItem1,
             this.pNGsToolStripMenuItem,
             this.imgToolStripMenuItem1});
-            this.exportDataToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.page_go;
+            this.exportDataToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.file_export_r;
             this.exportDataToolStripMenuItem.Name = "exportDataToolStripMenuItem";
             resources.ApplyResources(this.exportDataToolStripMenuItem, "exportDataToolStripMenuItem");
             // 
@@ -408,7 +413,7 @@ namespace HaRepacker.GUI
             this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.xMLToolStripMenuItem2,
             this.iMGToolStripMenuItem2});
-            this.importToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.page_add;
+            this.importToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.file_import_r;
             this.importToolStripMenuItem.Name = "importToolStripMenuItem";
             resources.ApplyResources(this.importToolStripMenuItem, "importToolStripMenuItem");
             // 
@@ -426,7 +431,7 @@ namespace HaRepacker.GUI
             // 
             // optionsToolStripMenuItem
             // 
-            this.optionsToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.cog;
+            this.optionsToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.cog_s;
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             resources.ApplyResources(this.optionsToolStripMenuItem, "optionsToolStripMenuItem");
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
@@ -470,14 +475,14 @@ namespace HaRepacker.GUI
             // 
             // renderMapToolStripMenuItem
             // 
-            this.renderMapToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.map;
+            this.renderMapToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.map_s;
             this.renderMapToolStripMenuItem.Name = "renderMapToolStripMenuItem";
             resources.ApplyResources(this.renderMapToolStripMenuItem, "renderMapToolStripMenuItem");
             this.renderMapToolStripMenuItem.Click += new System.EventHandler(this.renderMapToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
-            this.settingsToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.cog;
+            this.settingsToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.cog_s;
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             resources.ApplyResources(this.settingsToolStripMenuItem, "settingsToolStripMenuItem");
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
@@ -489,7 +494,7 @@ namespace HaRepacker.GUI
             // 
             // animateToolStripMenuItem
             // 
-            this.animateToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.lightning;
+            this.animateToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.bolt_s;
             this.animateToolStripMenuItem.Name = "animateToolStripMenuItem";
             resources.ApplyResources(this.animateToolStripMenuItem, "animateToolStripMenuItem");
             this.animateToolStripMenuItem.Click += new System.EventHandler(this.aPNGToolStripMenuItem_Click);
@@ -524,14 +529,14 @@ namespace HaRepacker.GUI
             // 
             // viewHelpToolStripMenuItem
             // 
-            this.viewHelpToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.help;
+            this.viewHelpToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.question_s;
             this.viewHelpToolStripMenuItem.Name = "viewHelpToolStripMenuItem";
             resources.ApplyResources(this.viewHelpToolStripMenuItem, "viewHelpToolStripMenuItem");
             this.viewHelpToolStripMenuItem.Click += new System.EventHandler(this.viewHelpToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
-            this.aboutToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.information;
+            this.aboutToolStripMenuItem.Image = global::HaRepacker.Properties.Resources.info_s;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);

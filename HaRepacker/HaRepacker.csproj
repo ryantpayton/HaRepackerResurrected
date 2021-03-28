@@ -354,6 +354,11 @@
     <Compile Include="GUI\CustomWZEncryptionInputBox.designer.cs">
       <DependentUpon>CustomWZEncryptionInputBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.ja.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -607,6 +612,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MainForm.zh-CHS.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -673,14 +679,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="GUI\SaveForm.resx">
       <DependentUpon>SaveForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -702,23 +703,6 @@
     <None Include="app.config" />
     <None Include="HaRepacker.res" />
     <None Include="packages.config" />
-    <None Include="Resources\page_white.png" />
-    <None Include="Resources\folder.png" />
-    <None Include="Resources\folder_add.png" />
-    <None Include="Resources\disk.png" />
-    <None Include="Resources\cog.png" />
-    <None Include="Resources\delete.png" />
-    <None Include="Resources\folder_go.png" />
-    <None Include="Resources\map.png" />
-    <None Include="Resources\information.png" />
-    <None Include="Resources\help.png" />
-    <None Include="Resources\add.png" />
-    <None Include="Resources\page_go.png" />
-    <None Include="Resources\arrow_refresh1.png" />
-    <None Include="Resources\lightning.png" />
-    <None Include="Resources\page_edit.png" />
-    <None Include="Resources\page_add.png" />
-    <None Include="Resources\find.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MapleLib\MapleLib.csproj">
@@ -749,25 +733,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pause_.png" />
-    <None Include="Resources\Play.png" />
-    <None Include="Resources\207px-Circle-undo.svg.png" />
-    <None Include="Resources\8800000_attack_10.png" />
-    <Content Include="Resources\arrow_left.png" />
-    <None Include="Resources\red_x1.png" />
-    <None Include="Resources\rename.png" />
-    <None Include="Resources\arrow_refresh.png" />
-    <Content Include="Resources\arrow_right.png" />
-    <None Include="Resources\img_default.png" />
-    <Resource Include="Resources\loading.gif" />
-    <None Include="Resources\expand.png" />
-    <None Include="Resources\collapse.png" />
-    <None Include="Resources\ladyboss_test_attack2_0.png" />
-    <Content Include="Resources\OrangeMushroom\orangeMushroom_Jump.gif" />
-    <Content Include="Resources\OrangeMushroom\orangeMushroom_Stand.gif" />
-    <Content Include="Resources\Pause.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="GUI\Panels\MainPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -792,6 +757,819 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-circle-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-hexagon-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-hexagon-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-hexagon-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-octagon-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-octagon-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-octagon-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-square-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-square-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-paintbrush-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-paintbrush-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-paintbrush-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-ruler-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-ruler-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-ruler-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pencil-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-fancy-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-fancy-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-fancy-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-nib-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-nib-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-nib-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-square-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-square-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pen-square-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-circle-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-circle-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-circle-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-hexagon-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-hexagon-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-hexagon-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-octagon-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-octagon-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-octagon-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-square-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-square-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus-square-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sync-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sync-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sync-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sync-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sync-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sync-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\trash-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\trash-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\trash-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\trash-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\trash-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\trash-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-circle-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus-circle-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-chart-pie-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-check-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-code-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-contract-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-csv-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-download-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-edit-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-excel-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-exclamation-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-export-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-image-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-import-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-invoice-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-invoice-dollar-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-medical-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-medical-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-minus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-pdf-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-plus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-powerpoint-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-prescription-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-signature-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-spreadsheet-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-times-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-upload-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-user-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-video-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-word-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-minus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-open-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-plus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folders-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-times-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-archive-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-audio-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-certificate-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-chart-line-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-user-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-video-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-video-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-word-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-word-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-minus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-minus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-open-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-open-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-plus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-plus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folders-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folders-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-times-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\folder-times-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-archive-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-archive-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-audio-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-audio-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-certificate-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-certificate-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-chart-line-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-chart-line-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-chart-pie-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-chart-pie-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-check-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-check-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-code-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-code-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-contract-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-contract-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-csv-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-csv-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-download-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-download-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-edit-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-edit-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-excel-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-excel-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-exclamation-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-exclamation-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-export-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-export-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-image-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-image-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-import-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-import-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-invoice-dollar-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-invoice-dollar-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-invoice-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-invoice-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-medical-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-medical-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-medical-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-medical-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-minus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-minus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-pdf-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-pdf-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-plus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-plus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-powerpoint-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-powerpoint-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-prescription-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-prescription-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-signature-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-signature-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-spreadsheet-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-spreadsheet-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-times-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-times-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-upload-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-upload-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\file-user-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-smile-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-times-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-times-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-times-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-pin-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-pin-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-pin-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-signs-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-signs-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-signs-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-circle-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-circle-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-circle-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-square-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-square-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\question-square-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bolt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bolt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bolt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cog-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cog-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cog-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cogs-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cogs-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cogs-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-circle-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-circle-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-circle-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-square-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-square-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\info-square-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marked-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marked-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marked-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marked-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marked-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marked-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-alt-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-alt-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-alt-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-alt-slash-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-alt-slash-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-alt-slash-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-check-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-check-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-check-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-edit-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-edit-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-edit-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-exclamation-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-exclamation-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-exclamation-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-minus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-minus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-minus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-plus-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-plus-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-plus-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-question-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-question-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-question-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-slash-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-slash-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-slash-s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-smile-l.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\map-marker-smile-r.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\loading.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
